@@ -13,7 +13,12 @@ import java.util.List;
 
 @Slf4j
 public class StandaloneBot extends BotCore implements UpdatesListener {
-    private static final String DEFAULT_TOKEN = "294103149:AAGPawepBdjAtu9z9aKDj2rLwwdNt0UDi9E";
+
+    // olivka
+    //private static final String DEFAULT_TOKEN = "294103149:AAGPawepBdjAtu9z9aKDj2rLwwdNt0UDi9E";
+
+    // rotten
+    private static final String DEFAULT_TOKEN = "668163913:AAE98c1hN0O5m1kyE3e9XgBLLQolN96fpH4";
 
     private TextLog callbacks = new TextLog(getConfig().getLogDir() + Cave.PATH_SEPARATOR + "updates.log");
 
