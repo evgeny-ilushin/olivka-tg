@@ -1,5 +1,6 @@
 package irc.tula.tg.core;
 
+import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
@@ -7,8 +8,10 @@ import com.pengrad.telegrambot.model.User;
 import irc.tula.tg.util.TextLog;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 @Slf4j
-public class StandaloneBot extends BotCore {
+public class StandaloneBot extends BotCore implements UpdatesListener {
     private static final String DEFAULT_TOKEN = "294103149:AAGPawepBdjAtu9z9aKDj2rLwwdNt0UDi9E";
 
     private TextLog callbacks = new TextLog(getConfig().getLogDir() + Cave.PATH_SEPARATOR + "updates.log");
@@ -18,13 +21,12 @@ public class StandaloneBot extends BotCore {
     }
 
     public static void main(String[] args) {
-        BotCore bot = new BotCore(DEFAULT_TOKEN);
+        StandaloneBot bot = new StandaloneBot(DEFAULT_TOKEN);
 
         log.info("Starting bot...");
-        bot.start();
+        bot.start(bot);
     }
 
-    @Override
     protected void onUpdate(Update update) {
         callbacks.add(toJson(update));
 
@@ -50,7 +52,22 @@ public class StandaloneBot extends BotCore {
         }
     }
 
+    private void processUpdate(Update update) {
+        try {
+            log.info("update: {}", update);
+            onUpdate(update);
+        } catch (Exception ex) {
+            log.error("processUpdate: {}", ex);
+        }
+    }
+
+    public int process(List<Update> list) {
+        list.forEach(item->processUpdate(item));
+        return UpdatesListener.CONFIRMED_UPDATES_ALL;
+    }
+
     private void chanserv(Long chatId, String replyNickName, String text) {
+        log.info("chanserv: ({}, {}, {})", chatId, replyNickName, text);
         sayOnChannel(chatId, replyNickName + ", иди в задницу");
     }
 

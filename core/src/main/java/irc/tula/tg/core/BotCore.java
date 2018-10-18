@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-public class BotCore implements UpdatesListener {
+public class BotCore {
     private final TelegramBot tg;
 
     @Getter
@@ -37,11 +37,11 @@ public class BotCore implements UpdatesListener {
         this(token, null);
     }
 
-    protected void start() {
+    protected void start(UpdatesListener cb) {
         // Cancell WH and start long polling
         val cwh = cancelWebhook();
 
-        tg.setUpdatesListener(this);
+        tg.setUpdatesListener(cb);
 
         // Loop forever : )
         while (true) { try { Thread.sleep(1000); } catch (Exception e) { log.error("System: {}", e); } }
@@ -76,23 +76,5 @@ public class BotCore implements UpdatesListener {
             log.error("sayOnChannel: {}", ex);
             return Optional.empty();
         }
-    }
-
-    protected void onUpdate(Update update) {
-    }
-
-    private void processUpdate(Update update) {
-        try {
-            log.info("update: {}", update);
-            onUpdate(update);
-        } catch (Exception ex) {
-            log.error("processUpdate: {}", ex);
-        }
-    }
-
-    @Override
-    public int process(List<Update> list) {
-        list.forEach(item->processUpdate(item));
-        return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
 }
