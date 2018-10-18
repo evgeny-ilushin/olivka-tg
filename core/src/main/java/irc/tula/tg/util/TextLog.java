@@ -1,5 +1,6 @@
 package irc.tula.tg.util;
 
+import irc.tula.tg.core.NewWorld;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,7 +25,7 @@ public class TextLog {
 		try
 		{
 			try (FileOutputStream fo = new FileOutputStream(location, true)) {
-				String line = tsformat.format(new Date()) + " " + text;
+				String line = tsformat.format(new Date()) + " " + text + NewWorld.EOL;
 				fo.write(line.getBytes());
 			} catch (Exception e) {
 				log.error("TextLog: {}", e);

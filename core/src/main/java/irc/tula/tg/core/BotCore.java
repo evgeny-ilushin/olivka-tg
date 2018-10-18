@@ -66,8 +66,9 @@ public class BotCore {
                     .parseMode(ParseMode.HTML)
                     .disableWebPagePreview(true)
                     .disableNotification(true)
-                    .replyToMessageId(1)
-                    .replyMarkup(new ForceReply());
+                    //.replyToMessageId(1)
+                    //.replyMarkup(new ForceReply())
+                    ;
 
             SendResponse sendResponse = tg.execute(request);
             boolean ok = sendResponse.isOk();

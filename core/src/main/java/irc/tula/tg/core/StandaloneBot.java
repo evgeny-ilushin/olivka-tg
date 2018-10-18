@@ -33,7 +33,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
         if (update.message() != null) {
             Message m = update.message();
             User from = m.from();
-            String replyNickName = NewWorld.NICK_PREFIX + from.username();
+            String nickName = from.username();
 
             // Ignore other bots?
             if (from.isBot()) {
@@ -46,7 +46,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
 
                 // I am text only
                 if (m.text() != null) {
-                    chanserv(replyChatId, replyNickName, m.text());
+                    chanserv(replyChatId, nickName, m.text());
                 }
             }
         }
@@ -66,8 +66,10 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
 
-    private void chanserv(Long chatId, String replyNickName, String text) {
-        log.info("chanserv: ({}, {}, {})", chatId, replyNickName, text);
+    private void chanserv(Long chatId, String nickName, String text) {
+        log.info("chanserv: ({}, {}, {})", chatId, nickName, text);
+        String replyNickName = NewWorld.NICK_PREFIX + nickName;
+
         sayOnChannel(chatId, replyNickName + ", иди в задницу");
     }
 
