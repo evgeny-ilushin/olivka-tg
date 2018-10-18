@@ -24,9 +24,17 @@ public class BotCore implements UpdatesListener {
     @Getter
     private final String token;
 
-    public BotCore(String token) {
+    @Getter
+    private final BotConfig config;
+
+    public BotCore(String token, BotConfig config) {
         this.token = token;
+        this.config = config == null? BotConfig.getDefaultConfig() : config;
         tg = new TelegramBot(token);
+    }
+
+    public BotCore(String token) {
+        this(token, null);
     }
 
     protected void start() {
@@ -52,7 +60,7 @@ public class BotCore implements UpdatesListener {
         }
     }
 
-    private Optional<Message> sayOnChannel(String chatId, String text) {
+    protected Optional<Message> sayOnChannel(Long chatId, String text) {
         try {
             SendMessage request = new SendMessage(chatId, text)
                     .parseMode(ParseMode.HTML)
@@ -70,9 +78,13 @@ public class BotCore implements UpdatesListener {
         }
     }
 
+    protected void onUpdate(Update update) {
+    }
+
     private void processUpdate(Update update) {
         try {
             log.info("update: {}", update);
+            onUpdate(update);
         } catch (Exception ex) {
             log.error("processUpdate: {}", ex);
         }

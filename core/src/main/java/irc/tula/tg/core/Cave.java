@@ -11,6 +11,8 @@ public abstract class Cave {
     private static String  locale = "windows-1251";
 
     public static final String LINE_SEPARATOR = "|";
+    public static final String PATH_SEPARATOR = "/";
+
     public static final int DEFAULT_REPLY_DELAY = 0; // No delay
 
     public static final String RDB_ROOT = "/home/olivka/bot/dat";
