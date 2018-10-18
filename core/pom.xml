@@ -40,7 +40,7 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <mainClass>irc.tula.tg.core.BotCore</mainClass>
+                                    <mainClass>irc.tula.tg.core.StandaloneBot</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>
