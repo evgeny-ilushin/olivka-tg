@@ -8,6 +8,7 @@ import com.pengrad.telegrambot.model.User;
 import irc.tula.tg.util.TextLog;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Slf4j
@@ -15,6 +16,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
     private static final String DEFAULT_TOKEN = "294103149:AAGPawepBdjAtu9z9aKDj2rLwwdNt0UDi9E";
 
     private TextLog callbacks = new TextLog(getConfig().getLogDir() + Cave.PATH_SEPARATOR + "updates.log");
+
+    private HashSet<Nickname> members = new HashSet<>();
 
     public StandaloneBot(String token) {
         super(token);
@@ -77,10 +80,22 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
     private void chanserv(Long chatId, Nickname nickName, String text) {
         log.info("chanserv: ({}, {}, {})", chatId, nickName, text);
         String replyNickName = nickName.toString();
+        if (members.add(nickName)) {
+            sayOnChannel(chatId, "теперь я знаю " + nickName);
+        }
 
         if (text.equalsIgnoreCase("0")) {
             sayOnChannel(chatId, replyNickName + ", " + (1 + RDBResource.RNG.nextInt(9)));
+        } else
+        if (text.equalsIgnoreCase("кто")) {
+            Nickname randNick = randomNick();
+            sayOnChannel(chatId, replyNickName + ", " + randNick);
         }
+
+    }
+
+    private Nickname randomNick() {
+        return (Nickname)members.toArray()[RDBResource.RNG.nextInt(members.size())];
     }
 
     private static String toJson(Update u) {
