@@ -29,7 +29,7 @@ public class BotCore {
 
     public BotCore(String token, BotConfig config) {
         this.token = token;
-        this.config = config == null? BotConfig.getDefaultConfig() : config;
+        this.config = new DefaultBotConfig();
         tg = new TelegramBot(token);
     }
 
