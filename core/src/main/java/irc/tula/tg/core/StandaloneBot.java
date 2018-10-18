@@ -84,7 +84,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
             sayOnChannel(chatId, "теперь я знаю " + nickName);
         }
 
-        if (text.equalsIgnoreCase("0")) {
+        if (text.equalsIgnoreCase("1")) {
             sayOnChannel(chatId, replyNickName + ", " + (1 + RDBResource.RNG.nextInt(9)));
         } else
         if (text.equalsIgnoreCase("кто")) {
