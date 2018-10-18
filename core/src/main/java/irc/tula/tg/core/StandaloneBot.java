@@ -78,8 +78,9 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
         log.info("chanserv: ({}, {}, {})", chatId, nickName, text);
         String replyNickName = nickName.toString();
 
-        if (text == "1")
-            sayOnChannel(chatId, replyNickName + ", 2");
+        if (text.equalsIgnoreCase("0")) {
+            sayOnChannel(chatId, replyNickName + ", " + (1 + RDBResource.RNG.nextInt(9)));
+        }
     }
 
     private static String toJson(Update u) {
