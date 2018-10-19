@@ -61,21 +61,30 @@ public class BotCore {
     }
 
     protected Optional<Message> sayOnChannel(Long chatId, String text) {
-        try {
-            SendMessage request = new SendMessage(chatId, text)
-                    .parseMode(ParseMode.HTML)
-                    .disableWebPagePreview(true)
-                    .disableNotification(true)
-                    //.replyToMessageId(1)
-                    //.replyMarkup(new ForceReply())
-                    ;
+        boolean fake = true;
 
-            SendResponse sendResponse = tg.execute(request);
-            boolean ok = sendResponse.isOk();
-            return Optional.of(sendResponse.message());
-        } catch (Exception ex) {
-            log.error("sayOnChannel: {}", ex);
+        fake = false;
+
+        if (fake) {
+            log.info("FAKE SEND: {} {}", chatId, text);
             return Optional.empty();
+        } else {
+            try {
+                SendMessage request = new SendMessage(chatId, text)
+                        .parseMode(ParseMode.HTML)
+                        .disableWebPagePreview(true)
+                        .disableNotification(true)
+                        //.replyToMessageId(1)
+                        //.replyMarkup(new ForceReply())
+                        ;
+
+                SendResponse sendResponse = tg.execute(request);
+                boolean ok = sendResponse.isOk();
+                return Optional.of(sendResponse.message());
+            } catch (Exception ex) {
+                log.error("sayOnChannel: {}", ex);
+                return Optional.empty();
+            }
         }
     }
 }

@@ -18,7 +18,11 @@ import java.util.stream.Stream;
 public class Info2Resource {
     @Getter
     @Setter(AccessLevel.PROTECTED)
-    private final String fullPath;
+    private final String directoryPath;
+
+    @Getter
+    @Setter(AccessLevel.PROTECTED)
+    private final String fileName;
 
     @Getter
     private boolean availabe = false;
@@ -28,12 +32,24 @@ public class Info2Resource {
 
     public int size() { return data.size(); }
 
-    public Info2Resource(String fullPath) {
-        this.fullPath = fullPath;
+    public Info2Resource(String directoryPath, String fileName) {
+        this.directoryPath = directoryPath;
+        this.fileName = fileName;
         reload();
     }
 
+    public Optional<Info2Record> firstMatch(String text) {
+        String text2 = MatchWild.preparePattern(text);
+        for (irc.tula.tg.core.Info2Record r : data) {
+            if (r.matches(text2)) {
+                return Optional.of(r);
+            }
+        }
+        return Optional.empty();
+    }
+
     private void reload() {
+        String fullPath = directoryPath + NewWorld.PATH_SEPARATOR + fileName;
         try (Stream<String> stream = Files.lines(Paths.get(fullPath), Charset.forName(Cave.getLocale()))) {
             stream.forEach(line -> {
                 if (StringUtils.isNotBlank(line)) {
@@ -55,50 +71,3 @@ public class Info2Resource {
     }
 }
 
-@Data
-@Slf4j
-@AllArgsConstructor
-class Info2Record {
-    private String pattern;
-    private String value;
-
-    public boolean matches(String text) {
-        char c = 0;
-        int index = 0;
-        boolean match = true;
-
-        if (text == null || text.length() < 1) {
-            return false;
-        }
-
-        for (char p: text.toCharArray()) {
-            switch (c) {
-                case '?':
-                    c = text.charAt(index++);
-                    break;
-                case '*':
-                    break;
-            }
-        }
-
-        do {
-            c = text.charAt(index++);
-
-            if (index >= text.length()) {
-                c = 0;
-                break;
-            }
-        } while (c != 0);
-        return false;
-    }
-
-    public static Optional<Info2Record>fromSource(String source) {
-        try {
-            int sep = source.indexOf(" ");
-            return Optional.of(new Info2Record(source.substring(0, sep).trim(), source.substring(sep).trim()));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return Optional.empty();
-        }
-    }
-}

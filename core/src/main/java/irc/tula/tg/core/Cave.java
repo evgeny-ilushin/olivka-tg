@@ -13,6 +13,13 @@ public abstract class Cave {
     public static final String LINE_SEPARATOR = "|";
     public static final String PATH_SEPARATOR = "/";
 
+    public static final char RDB_PREFIX = '~';
+    public static final char RDB_PREFIX_2 = '^';
+
+    public static final char[] NICK_SEPARATORS = {',', ':' };
+
+    public static final String RDB_FILE_EXTENSION = ".rdb";
+
     public static final int DEFAULT_REPLY_DELAY = 0; // No delay
 
     public static final String RDB_ROOT = "/home/olivka/bot/dat";
