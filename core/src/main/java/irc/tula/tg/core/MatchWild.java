@@ -34,7 +34,7 @@ public class MatchWild {
 
 		for (; ; ) {
 			if (pattern_index >= pattern.length()) {
-				if (str_index > str.length()) {
+				if (str_index >= str.length()) {
 					return 1;
 				}
 				return 0;
@@ -86,11 +86,12 @@ public class MatchWild {
 		System.out.println("" + r);
 	}
 	public static void main(String[] args) {
-		T("a*k*o", preparePattern("а кто вернулся в село а там опять яблокоболь"));
-		T("a*kto?", preparePattern("a kto"));
-		T("a*k*o", preparePattern(""));
+		//T("a*k*o", preparePattern("а кто вернулся в село а там опять яблокоболь"));
+		//T("a*kto?", preparePattern("a kto"));
+		//T("a*k*o", preparePattern(""));
 
-		T("передает*привет!*", preparePattern("пе"));
+		T("1", preparePattern("1"));
+		//T("передает*привет!*", preparePattern("пе"));
 		//T("передает*привет*", preparePattern("а кто в жопе"));
 
 		/*

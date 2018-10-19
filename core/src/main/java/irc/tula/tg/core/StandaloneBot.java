@@ -46,6 +46,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
 
         log.info("Starting bot...");
         bot.start(bot);
+        //FAKE_SEND = true;
 
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "а кто в жопе");
 
@@ -61,7 +62,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "скажи частушку");
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "гнилой, скажи частушку");
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "гнилой, 1234");
-        //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "1234");
+        //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "1");
     }
 
     protected void onUpdate(Update update) {
@@ -192,7 +193,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
     }
 
     private String caveReplace(Long chatId, String text, Nickname nickName) {
-        String res = text.replaceAll("N~", nickName.toString()).replaceAll("R~", randomNick().toString());
+        String res = text.replaceAll("N~", nickName.toString()).replaceAll("R~", randomNick().toString()).replaceAll("", NewWorld.LINEBREAK);
         if (res.startsWith("+")) {
             res = "/me " + res.substring(1);
         }

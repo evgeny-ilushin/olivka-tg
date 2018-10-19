@@ -12,4 +12,5 @@ public abstract class NewWorld {
     public static final String NICK_PREFIX = "@";
     public static final String PATH_SEPARATOR = "/";
     public static final String EOL = "\n";
+    public static final String LINEBREAK = "\n";
 }

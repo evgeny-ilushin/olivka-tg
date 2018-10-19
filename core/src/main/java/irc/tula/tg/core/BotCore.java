@@ -19,6 +19,8 @@ import java.util.Optional;
 
 @Slf4j
 public class BotCore {
+    protected static boolean FAKE_SEND = false;
+
     private final TelegramBot tg;
 
     @Getter
@@ -61,11 +63,7 @@ public class BotCore {
     }
 
     protected Optional<Message> sayOnChannel(Long chatId, String text) {
-        boolean fake = true;
-
-        fake = false;
-
-        if (fake) {
+        if (FAKE_SEND) {
             log.info("FAKE SEND: {} {}", chatId, text);
             return Optional.empty();
         } else {
