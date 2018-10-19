@@ -10,7 +10,7 @@ public abstract class Cave {
     @Setter(AccessLevel.PROTECTED)
     private static String  locale = "windows-1251";
 
-    public static final String LINE_SEPARATOR = "|";
+    public static final String LINE_SEPARATOR = "\\|";
     public static final String PATH_SEPARATOR = "/";
 
     public static final char RDB_PREFIX = '~';
