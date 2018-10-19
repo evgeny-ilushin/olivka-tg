@@ -63,7 +63,7 @@ public class BotCore {
     protected Optional<Message> sayOnChannel(Long chatId, String text) {
         boolean fake = true;
 
-        fake = false;
+        //fake = false;
 
         if (fake) {
             log.info("FAKE SEND: {} {}", chatId, text);
