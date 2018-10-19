@@ -193,7 +193,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
     }
 
     private String caveReplace(Long chatId, String text, Nickname nickName) {
-        String res = text.replaceAll("N~", nickName.toString()).replaceAll("R~", randomNick().toString()).replaceAll("", NewWorld.LINEBREAK);
+        String res = text.replaceAll("N~", nickName.toString()).replaceAll("R~", randomNick().toString()).replaceAll(Cave.LINE_SEPARATOR, NewWorld.LINE_SEPARATOR);
         if (res.startsWith("+")) {
             res = "/me " + res.substring(1);
         }
