@@ -212,6 +212,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
     }
 
     private void answerInfo2Match(Long chatId, Nickname nickName, String text, Info2Record inforec) {
+        log.info("answerInfo2Match: {} {} {} {}", chatId, nickName, text, inforec);
         boolean answerDonno = true;
 
         //answerDonno = false;
@@ -250,6 +251,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
     }
 
     private void answerScript(Long chatId, Nickname nickName, String scriptName) {
+        log.info("answerScript: {} {} {}", chatId, nickName, scriptName);
         String binary = getConfig().getScriptDir(scriptName + NewWorld.SCRIPT_SUFFIX);
         try {
             if(!Files.exists(Paths.get(binary))) {
@@ -262,6 +264,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
             if (StringUtils.isNotBlank(res)) {
                 res = nickName + NewWorld.NICK_SEPARATOR + res;
                 sayOnChannel(chatId, res);
+            } else {
+                log.error("answerScript zero reply");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -269,6 +273,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
     }
 
     private void answerText(Long chatId, Nickname nickName, String text) {
+        log.info("answerText: {} {} {}", chatId, nickName, text);
         String fullText = caveReplace(chatId, text, nickName);
         sayOnChannel(chatId, fullText);
     }
@@ -321,7 +326,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
         log.info("*** DEBUG MODE ***");
 
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "wz");
-        bot.chanserv(-1001082390874L, new Nickname("zloy", true), "а кто на");
+        bot.chanserv(-1001082390874L, new Nickname("zloy", true), "щёкино");
 
         // fake members
         /*
