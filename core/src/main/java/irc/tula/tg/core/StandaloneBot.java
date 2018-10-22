@@ -260,6 +260,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
             }
 
             ExecCommand ec = new ExecCommand(binary);
+            Thread.sleep(100);
+            //ec.getOutput();
             String res = ec.output;
             if (StringUtils.isNotBlank(res)) {
                 res = nickName + NewWorld.NICK_SEPARATOR + res;
