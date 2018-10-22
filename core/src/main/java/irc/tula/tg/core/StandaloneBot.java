@@ -5,10 +5,16 @@ import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.User;
+import irc.tula.tg.core.data.JsonObjectMapper;
+import irc.tula.tg.core.data.MyObjectMapper;
+import irc.tula.tg.util.ExecCommand;
 import irc.tula.tg.util.TextLog;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.FileNotFoundException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 @Slf4j
@@ -19,50 +25,72 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
     //private static final String[] BOT_NAMES = { "olivka", "оливка", "@OlivkaIrcBot" };
 
     // rotten
-    private static final String DEFAULT_TOKEN = "668163913:AAE98c1hN0O5m1kyE3e9XgBLLQolN96fpH4";
-    private static final String[] BOT_NAMES = { "rotten", "гнилой", "@rottenbot2018_bot" };
+    //private static final String DEFAULT_TOKEN = "668163913:AAE98c1hN0O5m1kyE3e9XgBLLQolN96fpH4";
+    //private static final String[] BOT_NAMES = { "rotten", "гнилой", "@rottenbot2018_bot" };
 
-    private static final String BOT_HOME = "/home/ec2-user/bin/bots/data";
+    //private static final String BOT_HOME = "/home/ec2-user/bin/bots/data";
+
     private static final String INFO2 = "info2.db";
     private static final String DONNO_RDB = "donno";
 
-    private TextLog callbacks = new TextLog(getConfig().getLogDir() + Cave.PATH_SEPARATOR + "updates.log");
+    private static final String MEMBERS_CACHE = "members.json";
+
+    private TextLog callbacks;
 
     // Members
     private HashSet<Nickname> members = new HashSet<>();
 
     // Info2
-    Info2Resource info2 = new Info2Resource(BOT_HOME, INFO2);
+    Info2Resource info2 = new Info2Resource(getConfig().getDataDirName(), INFO2);
 
     // RDBs
     private HashMap<String, RDBResource> rdbStore = new HashMap<>();
 
-    public StandaloneBot(String token) {
-        super(token);
+    // DBs
+    private final MyObjectMapper mapper;
+
+    public StandaloneBot(BotConfig config) {
+        super(config);
+        callbacks = new TextLog(getConfig().getLogDir("updates.log"));
+        mapper = new JsonObjectMapper(getConfig().getDataDirName());
+        loadState();
     }
 
     public static void main(String[] args) {
-        StandaloneBot bot = new StandaloneBot(DEFAULT_TOKEN);
+        try {
+            if (args.length != 1) {
+                System.out.println("Usage: BOT_JAR <path to config.json>");
 
-        log.info("Starting bot...");
-        bot.start(bot);
-        //FAKE_SEND = true;
+                // Sample
+                BotConfig c = BotConfig.getSample();
+                String sampleConfig = JsonObjectMapper.dumpConfig(c);
+                System.out.println("Sample config:\n\t" + sampleConfig);
 
-        //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "а кто в жопе");
+                return;
+            }
 
-        // fake members
-        /*
-        bot.members.add(new Nickname("User1", true));
-        bot.members.add(new Nickname("User2", true));
-        bot.members.add(new Nickname("User3", false));
-        */
+            String cfgPath = args[0];
 
-        //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "fа кто в жопе");
-        //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "а кто анус");
-        //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "скажи частушку");
-        //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "гнилой, скажи частушку");
-        //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "гнилой, 1234");
-        //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "1");
+            if(!Files.exists(Paths.get(cfgPath))) {
+                throw new FileNotFoundException(cfgPath);
+            }
+
+            Optional<BotConfig> c = JsonObjectMapper.readConfig(cfgPath);
+            if (c.isPresent()) {
+                StandaloneBot bot = new StandaloneBot(c.get());
+                log.info("Starting bot using {} ...", cfgPath);
+
+                if (bot.getConfig().isDebug()) {
+                    my_tests(bot);
+                }
+                else {
+                    bot.start(bot);
+                }
+            }
+        } catch (Exception ex) {
+            log.error("Bot crashed (config: {}): {}", args[0], ex);
+            ex.printStackTrace();
+        }
     }
 
     protected void onUpdate(Update update) {
@@ -117,6 +145,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
         String replyNickName = nickName.toString();
         if (members.add(nickName)) {
             sayOnChannel(chatId, "теперь я знаю " + nickName + " \uD83D\uDE0E");
+            saveState();
         }
 
         /*
@@ -133,7 +162,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
             answerInfo2Match(chatId, nickName, text, rep.get());
         } else {
             boolean my = false;
-            for (String s: BOT_NAMES) {
+            for (String s: getConfig().getNames()) {
                 if (text.startsWith(s)) {
                     my = true;
                     text = text.substring(s.length());
@@ -153,6 +182,22 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
                     answerDonno(chatId, nickName);
                 }
             }
+        }
+    }
+
+    private void saveState() {
+        mapper.write(MEMBERS_CACHE, members);
+    }
+
+    private void loadState() {
+        try {
+            HashSet<Nickname> m  =  (HashSet<Nickname>)mapper.read(MEMBERS_CACHE, HashSet.class);
+            if (m != null && m.size() > 0) {
+                log.info("Loaded MEMBERS cache: {}, {} nickname(s)", MEMBERS_CACHE, m.size());
+                members = m;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -181,9 +226,35 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
         }
 
         // Not an RDB
+        if (answerDonno && inforec.getValue().length() > 1 && inforec.getValue().charAt(0) == Cave.SCRIPT_PREFIX) {
+            // Script output
+            answerScript(chatId, nickName, inforec.getValue().substring(1));
+            answerDonno = false;
+        }
+
+        // Not a script or RDB
         if (answerDonno) {
             answerText(chatId, nickName, inforec.getValue());
             answerDonno = false;
+        }
+    }
+
+    private void answerScript(Long chatId, Nickname nickName, String scriptName) {
+        String binary = getConfig().getScriptDir(scriptName + NewWorld.SCRIPT_SUFFIX);
+        try {
+            if(!Files.exists(Paths.get(binary))) {
+                log.error("Script not found: {}", binary);
+                return;
+            }
+
+            ExecCommand ec = new ExecCommand(binary);
+            String res = ec.output;
+            if (StringUtils.isNotBlank(res)) {
+                res = nickName + NewWorld.NICK_SEPARATOR + res;
+                sayOnChannel(chatId, res);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -217,7 +288,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
         if (res != null)
             return res;
 
-        RDBResource newRes = new RDBResource(BOT_HOME + NewWorld.PATH_SEPARATOR + name + Cave.RDB_FILE_EXTENSION);
+        RDBResource newRes = new RDBResource(getConfig().getDataDir(name + Cave.RDB_FILE_EXTENSION));
 
         if (newRes.isAvailabe()) {
             log.info("Adding RDB to cache: {}", name);
@@ -234,11 +305,24 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
     private static String toJson(Update u) {
         return "{ \"update_id\":\"" + u.updateId() + "\", \"message\":\"" + u.message() + "\", \"edited_message\":\"" + u.editedMessage() + "\", \"channel_post\":\"" + u.channelPost() + "\", \"edited_channel_post\":\"" + u.editedChannelPost() + "\", \"inline_query\":\"" + u.inlineQuery() + "\", \"chosen_inline_result\":\"" + u.chosenInlineResult() + "\", \"callback_query\":\"" + u.callbackQuery() + "\", \"shipping_query\":\"" + u.shippingQuery() + "\", \"pre_checkout_query\":\"" + u.preCheckoutQuery() + "\" }";
     }
-}
 
-class DefaultBotConfig implements BotConfig {
-    @Override
-    public String getLogDir() {
-        return "/tmp";
+    private static void my_tests(StandaloneBot bot) {
+        log.info("*** DEBUG MODE ***");
+
+        bot.chanserv(-1001082390874L, new Nickname("zloy", true), "wz");
+
+        // fake members
+        /*
+        bot.members.add(new Nickname("User1", true));
+        bot.members.add(new Nickname("User2", true));
+        bot.members.add(new Nickname("User3", false));
+        */
+
+        //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "fа кто в жопе");
+        //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "а кто анус");
+        //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "скажи частушку");
+        //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "гнилой, скажи частушку");
+        //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "гнилой, 1234");
+        //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "1");
     }
 }

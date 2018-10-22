@@ -16,6 +16,8 @@ public abstract class Cave {
     public static final char RDB_PREFIX = '~';
     public static final char RDB_PREFIX_2 = '^';
 
+    public static final char SCRIPT_PREFIX = '$';
+
     public static final char[] NICK_SEPARATORS = {',', ':' };
 
     public static final String RDB_FILE_EXTENSION = ".rdb";

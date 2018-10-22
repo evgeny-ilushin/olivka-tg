@@ -13,4 +13,7 @@ public abstract class NewWorld {
     public static final String PATH_SEPARATOR = "/";
     public static final String EOL = "\n";
     public static final String LINE_SEPARATOR = "\n";
+
+    public static final String SCRIPT_SUFFIX = ".sh";
+    public static final String NICK_SEPARATOR = ", ";
 }

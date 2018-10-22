@@ -10,6 +10,8 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SetWebhook;
 import com.pengrad.telegrambot.response.BaseResponse;
 import com.pengrad.telegrambot.response.SendResponse;
+import irc.tula.tg.core.data.JsonObjectMapper;
+import irc.tula.tg.core.data.MyObjectMapper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -19,29 +21,19 @@ import java.util.Optional;
 
 @Slf4j
 public class BotCore {
-    protected static boolean FAKE_SEND = false;
-
     private final TelegramBot tg;
-
-    @Getter
-    private final String token;
 
     @Getter
     private final BotConfig config;
 
-    public BotCore(String token, BotConfig config) {
-        this.token = token;
-        this.config = new DefaultBotConfig();
-        tg = new TelegramBot(token);
-    }
-
-    public BotCore(String token) {
-        this(token, null);
+    public BotCore(BotConfig config) {
+        this.config = config;
+        tg = new TelegramBot(config.getToken());
     }
 
     protected void start(UpdatesListener cb) {
         // Cancell WH and start long polling
-        val cwh = cancelWebhook();
+        //val cwh = cancelWebhook();
 
         tg.setUpdatesListener(cb);
 
@@ -63,10 +55,15 @@ public class BotCore {
     }
 
     protected Optional<Message> sayOnChannel(Long chatId, String text) {
-        if (FAKE_SEND) {
+        if (config.isDebug()) {
             log.info("FAKE SEND: {} {}", chatId, text);
             return Optional.empty();
         } else {
+            // Typing notification
+            if (false) {
+
+            }
+
             try {
                 SendMessage request = new SendMessage(chatId, text)
                         .parseMode(ParseMode.HTML)
