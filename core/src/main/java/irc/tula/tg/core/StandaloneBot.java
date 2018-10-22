@@ -143,6 +143,13 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
     private void chanserv(Long chatId, Nickname nickName, String text) {
         log.info("chanserv: ({}, {}, {})", chatId, nickName, text);
         String replyNickName = nickName.toString();
+
+        /*
+        if (members.contains(nickName)) {
+            log.info("");
+        }
+        */
+
         if (members.add(nickName)) {
             sayOnChannel(chatId, "теперь я знаю " + nickName + " \uD83D\uDE0E");
             saveState();
@@ -191,10 +198,13 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
 
     private void loadState() {
         try {
-            HashSet<Nickname> m  =  (HashSet<Nickname>)mapper.read(MEMBERS_CACHE, HashSet.class);
-            if (m != null && m.size() > 0) {
-                log.info("Loaded MEMBERS cache: {}, {} nickname(s)", MEMBERS_CACHE, m.size());
-                members = m;
+            Object[] m  =  mapper.read(MEMBERS_CACHE, Nickname[].class);
+            if (m != null && m.length > 0) {
+                log.info("Loaded MEMBERS cache: {}, {} nickname(s)", MEMBERS_CACHE, m.length);
+                for (Object n: m) {
+                    members.add((Nickname)n);
+                }
+                //members = m;
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -299,7 +309,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
     }
 
     private Nickname randomNick() {
-        return (Nickname)members.toArray()[RDBResource.RNG.nextInt(members.size())];
+        int rPos = RDBResource.RNG.nextInt(members.size());
+        return (Nickname)(members.toArray()[rPos]);
     }
 
     private static String toJson(Update u) {
@@ -309,7 +320,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
     private static void my_tests(StandaloneBot bot) {
         log.info("*** DEBUG MODE ***");
 
-        bot.chanserv(-1001082390874L, new Nickname("zloy", true), "wz");
+        //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "wz");
+        bot.chanserv(-1001082390874L, new Nickname("zloy", true), "а кто на");
 
         // fake members
         /*
