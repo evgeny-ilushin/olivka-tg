@@ -52,7 +52,8 @@ public class JsonObjectMapper implements MyObjectMapper {
     @Override
     public void write(String filePath, Object object) {
         try {
-            String dump = mapper.writeValueAsString(object);
+            //String dump = mapper.writeValueAsString(object);
+            String dump = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
             Files.write(Paths.get(rootPath + NewWorld.PATH_SEPARATOR + filePath), dump.getBytes(), StandardOpenOption.CREATE);
         } catch (Exception ex) {
             ex.printStackTrace();
