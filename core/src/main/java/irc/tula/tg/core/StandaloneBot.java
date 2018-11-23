@@ -7,8 +7,12 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.User;
 import irc.tula.tg.core.data.JsonObjectMapper;
 import irc.tula.tg.core.data.MyObjectMapper;
+import irc.tula.tg.core.entity.DateInfoCollection;
+import irc.tula.tg.core.plugin.Plugin;
+import irc.tula.tg.core.plugin.SoWhat;
 import irc.tula.tg.util.ExecCommand;
 import irc.tula.tg.util.TextLog;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,7 +22,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 @Slf4j
-public class StandaloneBot extends BotCore implements UpdatesListener {
+public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBot {
 
     // olivka
     //private static final String DEFAULT_TOKEN = "294103149:AAGPawepBdjAtu9z9aKDj2rLwwdNt0UDi9E";
@@ -35,25 +39,36 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
 
     private static final String MEMBERS_CACHE = "members.json";
 
+    public BotConfig getConfig() { return config; }
+
+    @Getter
     private TextLog callbacks;
 
     // Members
+    @Getter
     private HashSet<Nickname> members = new HashSet<>();
 
     // Info2
+    @Getter
     Info2Resource info2 = new Info2Resource(getConfig().getDataDirName(), INFO2);
 
     // RDBs
+    @Getter
     private HashMap<String, RDBResource> rdbStore = new HashMap<>();
 
     // DBs
+    @Getter
     private final MyObjectMapper mapper;
+
+    // Pluigins
+    HashMap<String, Plugin> plugins = new HashMap<>();
 
     public StandaloneBot(BotConfig config) {
         super(config);
         callbacks = new TextLog(getConfig().getLogDir("updates.log"));
         mapper = new JsonObjectMapper(getConfig().getDataDirName());
         loadState();
+        loadPlugins();
     }
 
     public static void main(String[] args) {
@@ -91,6 +106,15 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
             log.error("Bot crashed (config: {}): {}", args[0], ex);
             ex.printStackTrace();
         }
+    }
+
+    private Plugin addPlugin(Plugin plugin) {
+        return plugins.put(plugin.getName(), plugin);
+    }
+
+    private void loadPlugins() {
+        addPlugin(new SoWhat());
+        plugins.forEach((k,v) -> v.initialize(this));
     }
 
     protected void onUpdate(Update update) {
@@ -243,6 +267,12 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
             answerDonno = false;
         }
 
+        // Plugin?
+        if (answerDonno && inforec.getValue().length() > 1 && inforec.getValue().charAt(0) == Cave.PLUGIN_PREFIX) {
+            answerPlugin(chatId, nickName, inforec.getValue().substring(1), text);
+            answerDonno = false;
+        }
+
         // Not a script or RDB
         if (answerDonno) {
             answerText(chatId, nickName, inforec.getValue());
@@ -274,6 +304,20 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
         }
     }
 
+    private void answerPlugin(Long chatId, Nickname nickName, String pluginName, String text) {
+        log.info("answerPlugin: {} {} {} {}", chatId, nickName, pluginName, text);
+
+        try {
+                Plugin p = plugins.get(pluginName);
+                if (p != null) {
+                    boolean res = p.process(this, chatId, nickName, text);
+                    log.info("answerPlugin->{}", res);
+                }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
     private void answerText(Long chatId, Nickname nickName, String text) {
         log.info("answerText: {} {} {}", chatId, nickName, text);
         String fullText = caveReplace(chatId, text, nickName);
@@ -288,7 +332,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
         return res;
     }
 
-    private void answerDonno(Long chatId, Nickname nickName) {
+    public void answerDonno(Long chatId, Nickname nickName) {
         RDBResource dn = getRdbByName(DONNO_RDB);
 
         log.info("DONNO: {}", nickName);
@@ -300,7 +344,22 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
         sayOnChannel(chatId, fullText);
     }
 
-    private RDBResource getRdbByName(String name) {
+    public void answerRdb(Long chatId, Nickname nickName, String rdb) {
+        try {
+            RDBResource dn = getRdbByName(rdb);
+            log.info("RDB: {}", nickName);
+
+            if (dn == null)
+                return;
+
+            String fullText = caveReplace(chatId, dn.nextSring(), nickName);
+            sayOnChannel(chatId, fullText);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public RDBResource getRdbByName(String name) {
         RDBResource res = rdbStore.get(name);
         if (res != null)
             return res;
@@ -315,7 +374,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
         return null;
     }
 
-    private Nickname randomNick() {
+    public Nickname randomNick() {
         int rPos = RDBResource.RNG.nextInt(members.size());
         return (Nickname)(members.toArray()[rPos]);
     }
@@ -328,7 +387,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener {
         log.info("*** DEBUG MODE ***");
 
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "wz");
-        bot.chanserv(-1001082390874L, new Nickname("zloy", true), "щёкино");
+        bot.chanserv(-1001082390874L, new Nickname("zloy", true), "123");
 
         // fake members
         /*

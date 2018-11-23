@@ -21,10 +21,11 @@ import java.util.Optional;
 
 @Slf4j
 public class BotCore {
-    private final TelegramBot tg;
+    @Getter
+    protected final TelegramBot tg;
 
     @Getter
-    private final BotConfig config;
+    protected final BotConfig config;
 
     public BotCore(BotConfig config) {
         this.config = config;
@@ -54,7 +55,7 @@ public class BotCore {
         }
     }
 
-    protected Optional<Message> sayOnChannel(Long chatId, String text) {
+    public Optional<Message> sayOnChannel(Long chatId, String text) {
         if (config.isDebug()) {
             log.info("FAKE SEND: {} {}", chatId, text);
             return Optional.empty();
