@@ -44,9 +44,6 @@ public class SoWhat implements Plugin {
         final Calendar now = Calendar.getInstance();
         List<DateItem> today = new ArrayList<>();
 
-        //int t1 = now.get(Calendar.DAY_OF_MONTH);
-        //int t2 = now.get(Calendar.MONTH);
-
         for (DateItem di : database.getItems()) {
             if (now.get(Calendar.DAY_OF_MONTH) == di.getDay() &&
                     (now.get(Calendar.MONTH)+1) == di.getMonth()) {
@@ -63,17 +60,11 @@ public class SoWhat implements Plugin {
                 bot.answerRdb(chatId, nickName, SOWHAT_RDB);
             }
 
-            StringBuilder dates = new StringBuilder();
             int ndx = 1;
             for (DateItem i : today) {
-                //if (dates.length() > 0 ) {
-                    //dates.append("</b>");
-                    String l = "" + (ndx++) + ". <i>" + i.getText() + "</i>";
-                    bot.sayOnChannel(chatId, l);
-                //}
-                //dates.append("" + (ndx++) + ". " + i.getText());
+                String l = "" + (ndx++) + ". <i>" + i.getText() + "</i>";
+                bot.sayOnChannel(chatId, l);
             }
-            //bot.sayOnChannel(chatId, dates.toString());
         }
 
         return false;
