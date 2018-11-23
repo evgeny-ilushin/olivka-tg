@@ -76,6 +76,7 @@ public class BotCore {
 
                 SendResponse sendResponse = tg.execute(request);
                 boolean ok = sendResponse.isOk();
+                log.info("TG.send: {}, {}", sendResponse, sendResponse.message());
                 return Optional.of(sendResponse.message());
             } catch (Exception ex) {
                 log.error("sayOnChannel: {}", ex);

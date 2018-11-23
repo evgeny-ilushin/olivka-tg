@@ -64,11 +64,13 @@ public class SoWhat implements Plugin {
             int ndx = 1;
             for (DateItem i : today) {
                 if (dates.length() > 0 ) {
-                    dates.append("</b>");
+                    //dates.append("</b>");
+                    String l = "" + (ndx++) + ". " + i.getText();
+                    bot.sayOnChannel(chatId, l);
                 }
-                dates.append("" + (ndx++) + ". " + i.getText());
+                //dates.append("" + (ndx++) + ". " + i.getText());
             }
-            bot.sayOnChannel(chatId, dates.toString());
+            //bot.sayOnChannel(chatId, dates.toString());
         }
 
         return false;
