@@ -318,7 +318,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         }
     }
 
-    private void answerText(Long chatId, Nickname nickName, String text) {
+    public void answerText(Long chatId, Nickname nickName, String text) {
         log.info("answerText: {} {} {}", chatId, nickName, text);
         String fullText = caveReplace(chatId, text, nickName);
         sayOnChannel(chatId, fullText);

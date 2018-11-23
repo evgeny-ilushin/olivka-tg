@@ -9,6 +9,7 @@ import java.util.Optional;
 
 public interface ChannelBot {
     Optional<Message> sayOnChannel(Long chatId, String text);
+    void answerText(Long chatId, Nickname nickName, String text);
     void answerDonno(Long chatId, Nickname nickName);
     void answerRdb(Long chatId, Nickname nickName, String rdb);
     Nickname randomNick();
