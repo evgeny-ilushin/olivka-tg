@@ -108,8 +108,11 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         }
     }
 
-    private Plugin addPlugin(Plugin plugin) {
-        return plugins.put(plugin.getName(), plugin);
+    private void addPlugin(Plugin plugin) {
+        if (plugin.getNames() != null) {
+            plugin.getNames().forEach(i -> plugins.put(i, plugin));
+        }
+        plugins.put(plugin.getName(), plugin);
     }
 
     private void loadPlugins() {
@@ -310,7 +313,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         try {
                 Plugin p = plugins.get(pluginName);
                 if (p != null) {
-                    boolean res = p.process(this, chatId, nickName, text);
+                    boolean res = p.process(this, chatId, nickName, text, pluginName);
                     log.info("answerPlugin->{}", res);
                 }
         } catch (Exception ex) {
