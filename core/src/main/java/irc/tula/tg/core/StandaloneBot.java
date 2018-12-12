@@ -287,20 +287,31 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         log.info("answerScript: {} {} {}", chatId, nickName, scriptName);
         String binary = getConfig().getScriptDir(scriptName + NewWorld.SCRIPT_SUFFIX);
         try {
-            if(!Files.exists(Paths.get(binary))) {
+            if (!Files.exists(Paths.get(binary))) {
                 log.error("Script not found: {}", binary);
                 return;
             }
 
-            ExecCommand ec = new ExecCommand(binary);
-            Thread.sleep(100);
-            //ec.getOutput();
-            String res = ec.output;
-            if (StringUtils.isNotBlank(res)) {
-                res = nickName + NewWorld.NICK_SEPARATOR + res;
-                sayOnChannel(chatId, res);
-            } else {
-                log.error("answerScript zero reply");
+            int numAttempts = 3; // : )
+
+            while (numAttempts > 0) {
+                try {
+                    ExecCommand ec = new ExecCommand(binary);
+                    Thread.sleep(100);
+                    //ec.getOutput();
+                    String res = ec.output;
+                    if (StringUtils.isNotBlank(res)) {
+                        res = nickName + NewWorld.NICK_SEPARATOR + res;
+                        sayOnChannel(chatId, res);
+                        numAttempts = 0;
+                    } else {
+                        log.error("answerScript zero reply, retry: " + numAttempts);
+                        numAttempts--;
+                        Thread.sleep(500);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         } catch (Exception ex) {
             ex.printStackTrace();
