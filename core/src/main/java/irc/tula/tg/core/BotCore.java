@@ -3,20 +3,14 @@ package irc.tula.tg.core;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.model.request.ForceReply;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SetWebhook;
 import com.pengrad.telegrambot.response.BaseResponse;
 import com.pengrad.telegrambot.response.SendResponse;
-import irc.tula.tg.core.data.JsonObjectMapper;
-import irc.tula.tg.core.data.MyObjectMapper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j

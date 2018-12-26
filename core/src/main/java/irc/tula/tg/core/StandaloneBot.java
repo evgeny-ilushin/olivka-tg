@@ -7,7 +7,8 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.User;
 import irc.tula.tg.core.data.JsonObjectMapper;
 import irc.tula.tg.core.data.MyObjectMapper;
-import irc.tula.tg.core.entity.DateInfoCollection;
+import irc.tula.tg.core.entity.IncomingMessage;
+import irc.tula.tg.core.entity.Nickname;
 import irc.tula.tg.core.plugin.Plugin;
 import irc.tula.tg.core.plugin.SoWhat;
 import irc.tula.tg.util.ExecCommand;
@@ -19,7 +20,10 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBot {
@@ -171,49 +175,49 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         log.info("chanserv: ({}, {}, {})", chatId, nickName, text);
         String replyNickName = nickName.toString();
 
-        /*
-        if (members.contains(nickName)) {
-            log.info("");
-        }
-        */
-
         if (members.add(nickName)) {
             sayOnChannel(chatId, "теперь я знаю " + nickName + " \uD83D\uDE0E");
             saveState();
         }
 
-        /*
-        if (text.equalsIgnoreCase("1")) {
-            sayOnChannel(chatId, replyNickName + ", " + (1 + RDBResource.RNG.nextInt(9)));
-        } else
-        if (text.equalsIgnoreCase("кто")) {
-            Nickname randNick = randomNick();
-            sayOnChannel(chatId, replyNickName + ", " + randNick);
-        }*/
+        boolean my = false;
+        boolean adminSays = nickName.toString().equals(getConfig().getAdmin());
 
+        for (String s: getConfig().getNames()) {
+            if (text.startsWith(s)) {
+                my = true;
+                log.info("*personal message*");
+                text = text.substring(s.length());
+                while (text.length() > 0 && (text.charAt(0) == Cave.NICK_SEPARATORS[0] || text.charAt(0) == Cave.NICK_SEPARATORS[1])) {
+                    text = text.substring(1).trim();
+                }
+                break;
+            }
+        }
+
+        if (adminSays) {
+            log.info("*admin message*");
+        }
+
+        IncomingMessage msg = new IncomingMessage(chatId, nickName, text, my, adminSays);
+
+        // Admin commands
+        if (processCommand(msg)) {
+            return;
+        }
+
+        // Something else
         Optional<Info2Record> rep = info2.firstMatch(text);
         if (rep.isPresent()) {
-            answerInfo2Match(chatId, nickName, text, rep.get());
+            answerInfo2Match(msg, rep.get());
         } else {
-            boolean my = false;
-            for (String s: getConfig().getNames()) {
-                if (text.startsWith(s)) {
-                    my = true;
-                    text = text.substring(s.length());
-                    while (text.length() > 0 && (text.charAt(0) == Cave.NICK_SEPARATORS[0] || text.charAt(0) == Cave.NICK_SEPARATORS[1])) {
-                        text = text.substring(1);
-                    }
-                    break;
-                }
-            }
-
             if (my) {
                 log.info("Personal message in chat: {}", text);
                 rep = info2.firstMatch(text.trim());
                 if (rep.isPresent()) {
-                    answerInfo2Match(chatId, nickName, text, rep.get());
+                    answerInfo2Match(msg, rep.get());
                 } else {
-                    answerDonno(chatId, nickName);
+                    answerDonno(msg);
                 }
             }
         }
@@ -238,14 +242,65 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         }
     }
 
-    private void answerInfo2Match(Long chatId, Nickname nickName, String text, Info2Record inforec) {
-        log.info("answerInfo2Match: {} {} {} {}", chatId, nickName, text, inforec);
+    private boolean processCommand(IncomingMessage msg) {
+        log.info("processCommand: {}", msg);
+        final boolean[] sayOk = { false };
+
+        try {
+            String[] result = msg.getText().trim().split(" ", 2);
+            if (result == null || result.length < 2) {
+                return false; // not a command 100%
+            }
+
+            String cmd = result[0];
+            String params = result[1];
+            msg.setText(params);
+
+            if (msg.isAdminMessage() && msg.isPersonal()) {
+                if ("forget".equalsIgnoreCase(cmd) || "нахер".equalsIgnoreCase(cmd)) {
+                    for (Nickname e: members) {
+                        if (e.toString().equals(params) || e.toString().equals(NewWorld.NICK_PREFIX+params)) {
+                            members.remove(e);
+                            sayOk[0] = true;
+                            break;
+                        }
+                    }
+                    /*
+                    members.forEach(e -> {
+                            if (e.toString().equals(params)) {
+                                members.remove(e);
+                                sayOk[0] = true;
+                                return;
+                            }
+                    });
+                    */
+                }
+            }
+
+            if (sayOk[0]) {
+                String reply = msg.getNickName() + NewWorld.NICK_SEPARATOR + "ok";
+                sayOnChannel(msg.getChatId(), reply);
+                return true;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            String reply = msg.getNickName() + NewWorld.NICK_SEPARATOR + ex.getMessage();
+            sayOnChannel(msg.getChatId(), reply);
+            return true;
+        }
+
+        return false;
+    }
+
+
+    private void answerInfo2Match(IncomingMessage msg, Info2Record inforec) {
+        log.info("answerInfo2Match: {} {}", msg, inforec);
         boolean answerDonno = true;
 
         //answerDonno = false;
 
         if (StringUtils.isBlank(inforec.getValue())) {
-            log.info("Blank INFO2 for: {}", text);
+            log.info("Blank INFO2 for: {}", msg.getText());
             return;
         }
 
@@ -255,7 +310,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
             if (r != null) {
                 String reply = r.nextSring();
-                answerText(chatId, nickName, reply);
+                answerText(msg, reply);
                 //answerDonno = false;
             }
 
@@ -266,25 +321,26 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         // Not an RDB
         if (answerDonno && inforec.getValue().length() > 1 && inforec.getValue().charAt(0) == Cave.SCRIPT_PREFIX) {
             // Script output
-            answerScript(chatId, nickName, inforec.getValue().substring(1));
+            answerScript(msg, inforec.getValue().substring(1));
             answerDonno = false;
         }
 
         // Plugin?
         if (answerDonno && inforec.getValue().length() > 1 && inforec.getValue().charAt(0) == Cave.PLUGIN_PREFIX) {
-            answerPlugin(chatId, nickName, inforec.getValue().substring(1), text);
+            answerPlugin(msg, inforec.getValue().substring(1));
             answerDonno = false;
         }
 
         // Not a script or RDB
         if (answerDonno) {
-            answerText(chatId, nickName, inforec.getValue());
+            answerText(msg, inforec.getValue());
             answerDonno = false;
         }
     }
 
-    private void answerScript(Long chatId, Nickname nickName, String scriptName) {
-        log.info("answerScript: {} {} {}", chatId, nickName, scriptName);
+    private void answerScript(IncomingMessage msg, String scriptName) {
+        log.info("answerScript: {} {}", msg, scriptName);
+
         String binary = getConfig().getScriptDir(scriptName + NewWorld.SCRIPT_SUFFIX);
         try {
             if (!Files.exists(Paths.get(binary))) {
@@ -301,8 +357,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                     //ec.getOutput();
                     String res = ec.output;
                     if (StringUtils.isNotBlank(res)) {
-                        res = nickName + NewWorld.NICK_SEPARATOR + res;
-                        sayOnChannel(chatId, res);
+                        res = msg.getNickName() + NewWorld.NICK_SEPARATOR + res;
+                        sayOnChannel(msg.getChatId(), res);
                         numAttempts = 0;
                     } else {
                         log.error("answerScript zero reply, retry: " + numAttempts);
@@ -318,13 +374,13 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         }
     }
 
-    private void answerPlugin(Long chatId, Nickname nickName, String pluginName, String text) {
-        log.info("answerPlugin: {} {} {} {}", chatId, nickName, pluginName, text);
+    private void answerPlugin(IncomingMessage msg, String pluginName) {
+        log.info("answerPlugin: {} {}", msg, pluginName);
 
         try {
                 Plugin p = plugins.get(pluginName);
                 if (p != null) {
-                    boolean res = p.process(this, chatId, nickName, text, pluginName);
+                    boolean res = p.process(this, msg, pluginName);
                     log.info("answerPlugin->{}", res);
                 }
         } catch (Exception ex) {
@@ -332,10 +388,10 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         }
     }
 
-    public void answerText(Long chatId, Nickname nickName, String text) {
-        log.info("answerText: {} {} {}", chatId, nickName, text);
-        String fullText = caveReplace(chatId, text, nickName);
-        sayOnChannel(chatId, fullText);
+    public void answerText(IncomingMessage msg, String text) {
+        log.info("answerText: {} {}", msg, text);
+        String fullText = caveReplace(msg.getChatId(), text, msg.getNickName());
+        sayOnChannel(msg.getChatId(), fullText);
     }
 
     private String caveReplace(Long chatId, String text, Nickname nickName) {
@@ -346,28 +402,28 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         return res;
     }
 
-    public void answerDonno(Long chatId, Nickname nickName) {
+    public void answerDonno(IncomingMessage msg) {
         RDBResource dn = getRdbByName(DONNO_RDB);
 
-        log.info("DONNO: {}", nickName);
+        log.info("DONNO: {}", msg.getNickName());
 
         if (dn == null)
             return;
 
-        String fullText = caveReplace(chatId, dn.nextSring(), nickName);
-        sayOnChannel(chatId, fullText);
+        String fullText = caveReplace(msg.getChatId(), dn.nextSring(), msg.getNickName());
+        sayOnChannel(msg.getChatId(), fullText);
     }
 
-    public void answerRdb(Long chatId, Nickname nickName, String rdb) {
+    public void answerRdb(IncomingMessage msg, String rdb) {
         try {
             RDBResource dn = getRdbByName(rdb);
-            log.info("RDB: {}", nickName);
+            log.info("RDB: {}", rdb);
 
             if (dn == null)
                 return;
 
-            String fullText = caveReplace(chatId, dn.nextSring(), nickName);
-            sayOnChannel(chatId, fullText);
+            String fullText = caveReplace(msg.getChatId(), dn.nextSring(), msg.getNickName());
+            sayOnChannel(msg.getChatId(), fullText);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -401,7 +457,11 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         log.info("*** DEBUG MODE ***");
 
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "wz");
-        bot.chanserv(-1001082390874L, new Nickname("zloy", true), "123");
+        //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "123");
+
+        // Dec 26/2018
+        bot.chanserv(-1001082390874L, new Nickname("ncuxonycbka", true), "@rottenbot2018_bot нахер @ncuxonycbka");
+
 
         // fake members
         /*

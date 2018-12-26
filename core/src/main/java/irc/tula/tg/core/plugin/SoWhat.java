@@ -1,7 +1,8 @@
 package irc.tula.tg.core.plugin;
 
 import irc.tula.tg.core.ChannelBot;
-import irc.tula.tg.core.Nickname;
+import irc.tula.tg.core.entity.IncomingMessage;
+import irc.tula.tg.core.entity.Nickname;
 import irc.tula.tg.core.entity.DateInfoCollection;
 import irc.tula.tg.core.entity.DateItem;
 import org.apache.commons.lang3.StringUtils;
@@ -52,7 +53,7 @@ public class SoWhat implements Plugin {
     public void release(ChannelBot bot) {}
 
     @Override
-    public boolean process(ChannelBot bot, Long chatId, Nickname nickName, String text, String pluginName) {
+    public boolean process(ChannelBot bot, IncomingMessage msg, String pluginName) {
         final Calendar now = Calendar.getInstance();
         List<DateItem> today = new ArrayList<>();
         boolean personal = false;
@@ -76,14 +77,14 @@ public class SoWhat implements Plugin {
 
         if (today.size() <= 0) {
             // Nothing
-            bot.answerRdb(chatId, nickName, SOWHAT_RDB_NONE);
+            bot.answerRdb(msg, SOWHAT_RDB_NONE);
         } else {
             if (today.size() <= 4) {
                 // Not too much
-                bot.answerRdb(chatId, nickName, SOWHAT_RDB_FEW);
+                bot.answerRdb(msg, SOWHAT_RDB_FEW);
             } else {
                 // Normal
-                bot.answerRdb(chatId, nickName, SOWHAT_RDB);
+                bot.answerRdb(msg, SOWHAT_RDB);
             }
 
             int maxNdx = 5; // Load 10 or less
@@ -97,15 +98,15 @@ public class SoWhat implements Plugin {
                 if (personal) {
                     Date ts = new Date(1000L * i.getTs());
                     String l = "" + (ndx++) + ". <i>" + i.getText() + "</i> (" + i.getNick() + ", " + format.format(ts) + ")";
-                    bot.sayOnChannel(chatId, l);
+                    bot.sayOnChannel(msg.getChatId(), l);
                 } else {
                     String l = "" + (ndx++) + ". <i>" + i.getText() + "</i>";
-                    bot.sayOnChannel(chatId, l);
+                    bot.sayOnChannel(msg.getChatId(), l);
                 }
                 if (ndx > maxNdx) {
                     if (today.size() > maxNdx) {
                         String tail = "...<b>" + (today.size() - maxNdx) + "</b> more";
-                        bot.sayOnChannel(chatId, tail);
+                        bot.sayOnChannel(msg.getChatId(), tail);
                     }
                     break;
                 }

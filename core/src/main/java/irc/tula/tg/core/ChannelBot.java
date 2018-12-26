@@ -2,6 +2,8 @@ package irc.tula.tg.core;
 
 import com.pengrad.telegrambot.model.Message;
 import irc.tula.tg.core.data.MyObjectMapper;
+import irc.tula.tg.core.entity.IncomingMessage;
+import irc.tula.tg.core.entity.Nickname;
 import irc.tula.tg.util.TextLog;
 
 import java.util.HashSet;
@@ -9,9 +11,9 @@ import java.util.Optional;
 
 public interface ChannelBot {
     Optional<Message> sayOnChannel(Long chatId, String text);
-    void answerText(Long chatId, Nickname nickName, String text);
-    void answerDonno(Long chatId, Nickname nickName);
-    void answerRdb(Long chatId, Nickname nickName, String rdb);
+    void answerText(IncomingMessage msg, String reply);
+    void answerDonno(IncomingMessage msg);
+    void answerRdb(IncomingMessage msg, String rdb);
     Nickname randomNick();
     RDBResource getRdbByName(String name);
     TextLog getCallbacks();

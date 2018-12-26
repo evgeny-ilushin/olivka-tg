@@ -1,7 +1,7 @@
 package irc.tula.tg.core.plugin;
 
 import irc.tula.tg.core.ChannelBot;
-import irc.tula.tg.core.Nickname;
+import irc.tula.tg.core.entity.IncomingMessage;
 
 import java.util.List;
 
@@ -9,6 +9,6 @@ public interface Plugin {
     String getName();
     List<String> getNames();
     void initialize(ChannelBot bot);
-    boolean process(ChannelBot bot, Long chatId, Nickname nickName, String text, String pluginName);
+    boolean process(ChannelBot bot, IncomingMessage msg, String pluginName);
     void release(ChannelBot bot);
 }
