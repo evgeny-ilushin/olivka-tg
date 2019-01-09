@@ -10,5 +10,6 @@ public interface Plugin {
     List<String> getNames();
     void initialize(ChannelBot bot);
     boolean process(ChannelBot bot, IncomingMessage msg, String pluginName);
+    boolean processCommand(ChannelBot bot, String cmd, String params, IncomingMessage msg, String pluginName);
     void release(ChannelBot bot);
 }

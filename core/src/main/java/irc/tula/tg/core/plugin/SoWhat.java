@@ -115,4 +115,47 @@ public class SoWhat implements Plugin {
 
         return false;
     }
+
+    @Override
+    public boolean processCommand(ChannelBot bot, String cmd, String params, IncomingMessage msg, String pluginName) {
+        boolean res = false;
+
+        if (msg.isPersonal() && "adddate".equalsIgnoreCase(cmd)) {
+            String[] result = params.trim().split(" ", 2);
+            if (result == null || result.length < 2) {
+                bot.answerDonno(msg);
+                return res = false;
+            }
+
+            String sdate = result[0];
+            String text = result[1];
+            Date date = null;
+
+            try {
+                date = format.parse(sdate);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                bot.answerDonno(msg);
+                return res = false;
+            }
+
+            if (date == null || StringUtils.isBlank(text)) {
+                bot.answerDonno(msg);
+                return res = false;
+            }
+
+            try {
+                DateItem ndi = DateItem.addNew(date, text, msg.getNickName());
+                database.getItems().add(ndi);
+                bot.getMapper().write(SOWHAT_DB, database);
+                res = true;
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+        }
+
+        return res;
+    }
 }

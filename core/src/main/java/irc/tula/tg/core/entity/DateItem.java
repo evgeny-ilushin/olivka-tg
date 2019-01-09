@@ -4,6 +4,10 @@ package irc.tula.tg.core.entity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.NoArgsConstructor;
+
+import java.util.Calendar;
+import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -16,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "ts"
 })
 
+@NoArgsConstructor
 public class DateItem {
 
     @JsonProperty("id")
@@ -31,7 +36,20 @@ public class DateItem {
     @JsonProperty("nick")
     private String nick;
     @JsonProperty("ts")
-    private Integer ts;
+    private Long ts;
+
+    public static DateItem addNew(Date date, String text, Nickname nickName) {
+        DateItem res = new DateItem();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        res.setNick(nickName.toString());
+        res.setText(text);
+        res.setTs((new Date().getTime())/1000L);
+        res.setYear(cal.get(Calendar.YEAR));
+        res.setDay(cal.get(Calendar.DAY_OF_MONTH));
+        res.setMonth(cal.get(Calendar.MONTH)+1);
+        return res;
+    }
 
     @JsonProperty("id")
     public Integer getId() {
@@ -94,12 +112,12 @@ public class DateItem {
     }
 
     @JsonProperty("ts")
-    public Integer getTs() {
+    public Long getTs() {
         return ts;
     }
 
     @JsonProperty("ts")
-    public void setTs(Integer ts) {
+    public void setTs(Long ts) {
         this.ts = ts;
     }
 

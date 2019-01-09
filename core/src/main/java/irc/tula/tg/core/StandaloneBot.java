@@ -245,6 +245,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
     private boolean processCommand(IncomingMessage msg) {
         log.info("processCommand: {}", msg);
         final boolean[] sayOk = { false };
+        boolean done = false;
 
         try {
             String[] result = msg.getText().trim().split(" ", 2);
@@ -265,15 +266,19 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                             break;
                         }
                     }
-                    /*
-                    members.forEach(e -> {
-                            if (e.toString().equals(params)) {
-                                members.remove(e);
-                                sayOk[0] = true;
-                                return;
-                            }
-                    });
-                    */
+                }
+            }
+
+            if (!sayOk[0] && msg.isPersonal() && "adddate".equalsIgnoreCase(cmd)) {
+                try {
+                    Plugin soWhat = plugins.get(SoWhat.PLUGIN_NAME);
+                    if (soWhat != null) {
+                        boolean res = soWhat.processCommand(this, cmd, params, msg, SoWhat.PLUGIN_NAME);
+                        log.info("processCommand->{}", res);
+                        sayOk[0] = res;
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
             }
 
@@ -460,7 +465,15 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "123");
 
         // Dec 26/2018
-        bot.chanserv(-1001082390874L, new Nickname("ncuxonycbka", true), "@rottenbot2018_bot нахер @ncuxonycbka");
+        //TransactionalStorage ts = TransactionalStorage.getInstance();
+        //irc.tula.tg.core.db.entity.User u = ts.getUser(0);
+        //irc.tula.tg.core.db.entity.User u = ts.findUser("говно");
+
+        //bot.chanserv(-1001082390874L, new Nickname("ncuxonycbka", true), "@rottenbot2018_bot нахер @ncuxonycbka");
+
+        // adddate
+        //bot.chanserv(-1001082390874L, new Nickname("ncuxonycbka", true), "@rottenbot2018_bot adddate 09/01/2018 added adddate");
+        bot.chanserv(-1001082390874L, new Nickname("zloy", true), "123");
 
 
         // fake members
