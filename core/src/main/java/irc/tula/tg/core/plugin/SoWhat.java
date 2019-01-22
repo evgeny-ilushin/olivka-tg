@@ -29,6 +29,7 @@ public class SoWhat implements Plugin {
 
 
     private DateInfoCollection database;
+    private boolean loaded = false;
 
     public String getName() { return "sowhat"; }
 
@@ -46,7 +47,14 @@ public class SoWhat implements Plugin {
 
     @Override
     public void initialize(ChannelBot bot) {
-        database = bot.getMapper().read(SOWHAT_DB, DateInfoCollection.class);
+
+        if (!loaded) {
+            database = bot.getMapper().read(SOWHAT_DB, DateInfoCollection.class);
+            Collections.sort(database.getItems());
+            //bot.getMapper().write(SOWHAT_DB+".new.json", database);
+
+            loaded = true;
+        }
     }
 
     @Override

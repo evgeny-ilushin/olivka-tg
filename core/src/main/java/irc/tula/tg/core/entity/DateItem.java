@@ -11,20 +11,23 @@ import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "id",
+        "sid",
         "day",
         "month",
         "year",
         "text",
         "nick",
-        "ts"
+        "ts",
+        "id"
 })
 
 @NoArgsConstructor
-public class DateItem {
+public class DateItem implements Comparable<DateItem> {
 
     @JsonProperty("id")
     private Integer id;
+    @JsonProperty("sid")
+    private String sid;
     @JsonProperty("day")
     private Integer day;
     @JsonProperty("month")
@@ -48,6 +51,7 @@ public class DateItem {
         res.setYear(cal.get(Calendar.YEAR));
         res.setDay(cal.get(Calendar.DAY_OF_MONTH));
         res.setMonth(cal.get(Calendar.MONTH)+1);
+        res.setSid();
         return res;
     }
 
@@ -59,6 +63,19 @@ public class DateItem {
     @JsonProperty("id")
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    @JsonProperty("sid")
+    public String getSid() {
+        return sid;
+    }
+
+    @JsonProperty("sid")
+    public void setSid(String sid) {
+        this.sid = sid;
+    }
+    public void setSid() {
+        this.sid = toSortableString();
     }
 
     @JsonProperty("day")
@@ -121,4 +138,14 @@ public class DateItem {
         this.ts = ts;
     }
 
+    @Override
+    public int compareTo(DateItem o) {
+        return (sid = toSortableString()).compareTo(o.toSortableString());
+    }
+
+    public String toSortableString() {
+        Integer n_year = (year == null || year.equals(0))? 1970 : year;
+        //return String.format("%04d_%02d_%02d", n_year, month, day);
+        return String.format("%02d_%02d_%04d", month, day, n_year);
+    }
 }
