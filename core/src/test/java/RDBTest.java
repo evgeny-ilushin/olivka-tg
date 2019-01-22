@@ -14,7 +14,7 @@ public class RDBTest {
         assertEquals(10, r.getDelay().intValue());
 
         for (int i = 0; i < 10; i++) {
-            log.info("" + (i+1) + ": " + r.nextSring());
+            log.info("" + (i+1) + ": " + r.nextString());
         }
     }
 }

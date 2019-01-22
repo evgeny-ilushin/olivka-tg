@@ -74,9 +74,10 @@ public class RDBResource {
     }
 
     @Deprecated
-    public String nextSring() {
+    public String nextString() {
         if (availabe) {
-            return data.get(RNG.nextInt(data.size()));
+            String preRes = data.get(RNG.nextInt(data.size()));
+            return preRes;
         }
         return null;
     }

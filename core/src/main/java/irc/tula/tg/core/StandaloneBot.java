@@ -314,7 +314,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             RDBResource r = getRdbByName(rdbName);
 
             if (r != null) {
-                String reply = r.nextSring();
+                String reply = nextString(r);
                 answerText(msg, reply);
                 //answerDonno = false;
             }
@@ -415,8 +415,13 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         if (dn == null)
             return;
 
-        String fullText = caveReplace(msg.getChatId(), dn.nextSring(), msg.getNickName());
+        String fullText = caveReplace(msg.getChatId(), nextString(dn), msg.getNickName());
         sayOnChannel(msg.getChatId(), fullText);
+    }
+
+    public String nextString(RDBResource r) {
+        String res = r.nextString();
+        return rdbDeep(res);
     }
 
     public void answerRdb(IncomingMessage msg, String rdb) {
@@ -427,7 +432,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             if (dn == null)
                 return;
 
-            String fullText = caveReplace(msg.getChatId(), dn.nextSring(), msg.getNickName());
+            String fullText = caveReplace(msg.getChatId(), nextString(dn), msg.getNickName());
             sayOnChannel(msg.getChatId(), fullText);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -458,6 +463,54 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         return "{ \"update_id\":\"" + u.updateId() + "\", \"message\":\"" + u.message() + "\", \"edited_message\":\"" + u.editedMessage() + "\", \"channel_post\":\"" + u.channelPost() + "\", \"edited_channel_post\":\"" + u.editedChannelPost() + "\", \"inline_query\":\"" + u.inlineQuery() + "\", \"chosen_inline_result\":\"" + u.chosenInlineResult() + "\", \"callback_query\":\"" + u.callbackQuery() + "\", \"shipping_query\":\"" + u.shippingQuery() + "\", \"pre_checkout_query\":\"" + u.preCheckoutQuery() + "\" }";
     }
 
+    private String rdbDeep(String source) {
+        StringBuilder res = new StringBuilder();
+        Character vAct = '$', vLb = '{', vRb = '}';
+        if (!source.contains("$")) {
+            //log.info("no inner RDBs");
+            return source;
+        }
+
+        char[] s = source.toCharArray();
+        int p = 0;
+
+        do {
+            char c = s[p];
+            boolean cp = true;
+
+            if (c == vAct && (s.length - p) > 3 /* "${}" */
+            && (s[p+1] == vLb)) {
+                int p1 = p+2;
+                while (Character.isLetterOrDigit(s[p1]) && p1 < s.length) {
+                    p1++;
+                }
+                if (s[p1] == vRb) {
+                    String rdb = source.substring(p+2, p1);
+                    log.info("Got it: {}", rdb);
+                    RDBResource r = getRdbByName(rdb);
+                    if (r != null) {
+                        String innerText = nextString(r);
+                        if (StringUtils.isNotBlank(innerText)) {
+                            res.append(innerText);
+                            log.info("Got inner RDB: {} -> {}", rdb, innerText);
+                            cp = false;
+                            p = p1;
+                        }
+
+                    }
+                }
+
+            }
+
+            if (cp) {
+                res.append(c);
+            }
+
+        } while (++p < s.length);
+
+        return res.toString();
+    }
+
     private static void my_tests(StandaloneBot bot) {
         log.info("*** DEBUG MODE ***");
 
@@ -474,6 +527,10 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         // adddate
         //bot.chanserv(-1001082390874L, new Nickname("ncuxonycbka", true), "@rottenbot2018_bot adddate 09/01/2018 added adddate");
         bot.chanserv(-1001082390874L, new Nickname("zloy", true), "123");
+
+        // Inner RDB - 2019
+        //String s = bot.rdbDeep(" sigh worgjoijrpgja 140  *Г24 ${dateprefix1}again");
+        //log.info("s: {}", s);
 
 
         // fake members
