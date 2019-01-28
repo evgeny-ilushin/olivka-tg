@@ -70,29 +70,40 @@ public class SoWhat implements Plugin {
             personal = true; // Only custom records
         }
 
-        // Collect matches
+        // Collect matches && Filer out dupes
+        HashSet<String> all = new HashSet<>();
         for (DateItem di : database.getItems()) {
             if (now.get(Calendar.DAY_OF_MONTH) == di.getDay()
                 && (now.get(Calendar.MONTH)+1) == di.getMonth()) {
                 if (!personal) {
-                    today.add(di);
+                    if (!all.contains(di.getText())) {
+                        today.add(di);
+                        all.add(di.getText());
+                    }
                 } else {
                     if (StringUtils.isNotBlank(di.getNick()) && !"n/a".equalsIgnoreCase(di.getNick()) && di.getTs() != null) {
-                        today.add(di);
+                        if (!all.contains(di.getText())) {
+                            today.add(di);
+                            all.add(di.getText());
+                        }
                     }
                 }
             }
         }
 
         // Filer out dupes
+        /*
         HashSet<String> all = new HashSet<>();
-        for (DateItem i : today) {
+        Iterator<DateItem>items = today.iterator();
+        while (items.hasNext()) {
+            DateItem i = items.next();
             if (all.contains(i.getText())) {
                 today.remove(i);
             } else {
                 all.add(i.getText());
             }
         }
+        */
 
         if (today.size() <= 0) {
             // Nothing
