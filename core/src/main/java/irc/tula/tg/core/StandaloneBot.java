@@ -181,7 +181,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         Nickname nCache = members.get(from_id);
         if (nCache != null) {
             // Already seen
-            if ((""+nCache) != (""+nickName)) {
+            if (!(""+nCache).equals(""+nickName)) {
                 // Renamed
                 members.put(from_id, nickName);
                 sayOnChannel(chatId, "теперь я знаю " + nCache + " как " + nickName + " \uD83D\uDE0E");
@@ -550,7 +550,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
         // adddate
         //bot.chanserv(-1001082390874L, new Nickname("ncuxonycbka", true), "@rottenbot2018_bot adddate 09/01/2018 added adddate");
-        bot.chanserv(-1001082390874L, new Nickname(123, "zloy2", true), "123");
+        bot.chanserv(-1001082390874L, new Nickname(123, "zloy", true), "123");
 
         // Inner RDB - 2019
         //String s = bot.rdbDeep(" sigh worgjoijrpgja 140  *Г24 ${dateprefix1}again");
