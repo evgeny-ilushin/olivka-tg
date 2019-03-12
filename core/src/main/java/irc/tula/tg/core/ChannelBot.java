@@ -6,7 +6,7 @@ import irc.tula.tg.core.entity.IncomingMessage;
 import irc.tula.tg.core.entity.Nickname;
 import irc.tula.tg.util.TextLog;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Optional;
 
 public interface ChannelBot {
@@ -17,7 +17,7 @@ public interface ChannelBot {
     Nickname randomNick();
     RDBResource getRdbByName(String name);
     TextLog getCallbacks();
-    HashSet<Nickname> getMembers();
+    HashMap<Integer, Nickname> getMembers();
     Info2Resource getInfo2();
     MyObjectMapper getMapper();
     BotConfig getConfig();

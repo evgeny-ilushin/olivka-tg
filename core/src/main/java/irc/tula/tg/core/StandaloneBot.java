@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,7 +51,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
     // Members
     @Getter
-    private HashSet<Nickname> members = new HashSet<>();
+    private HashMap<Integer, Nickname> members = new HashMap<>();
 
     // Info2
     @Getter
@@ -133,11 +134,12 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             String nickName = from.username();
             Nickname nick;
 
+            // Bullshit
             if (nickName == null) {
                 nickName = from.firstName();
-                nick = new Nickname(nickName, false);
+                nick = new Nickname(from.id(), nickName, false);
             } else {
-                nick = new Nickname(nickName, true);
+                nick = new Nickname(from.id(), nickName, true);
             }
 
             // Ignore other bots?
@@ -174,11 +176,25 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
     private void chanserv(Long chatId, Nickname nickName, String text) {
         log.info("chanserv: ({}, {}, {})", chatId, nickName, text);
         String replyNickName = nickName.toString();
+        Integer from_id = nickName.getId();
 
-        if (members.add(nickName)) {
+        Nickname nCache = members.get(from_id);
+        if (nCache != null) {
+            // Already seen
+            if ((""+nCache) != (""+nickName)) {
+                // Renamed
+                members.put(from_id, nickName);
+                sayOnChannel(chatId, "теперь я знаю " + nCache + " как " + nickName + " \uD83D\uDE0E");
+                saveState();
+            }
+        } else {
+            members.put(from_id, nickName);
             sayOnChannel(chatId, "теперь я знаю " + nickName + " \uD83D\uDE0E");
             saveState();
         }
+
+        // Last seen
+        nickName.notice();
 
         boolean my = false;
         boolean adminSays = nickName.toString().equals(getConfig().getAdmin());
@@ -224,7 +240,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
     }
 
     private void saveState() {
-        mapper.write(MEMBERS_CACHE, members);
+        mapper.write(MEMBERS_CACHE, members.values());
     }
 
     private void loadState() {
@@ -232,12 +248,20 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             Object[] m  =  mapper.read(MEMBERS_CACHE, Nickname[].class);
             if (m != null && m.length > 0) {
                 log.info("Loaded MEMBERS cache: {}, {} nickname(s)", MEMBERS_CACHE, m.length);
-                for (Object n: m) {
-                    members.add((Nickname)n);
+                for (Object o: m) {
+                    Nickname n = (Nickname)o;
+
+                    if (n.getId() != null) {
+                        members.put(n.getId(), n);
+                    } else {
+                        log.info("No id for MEMBER {}", n);
+                    }
                 }
                 //members = m;
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
+            log.info("No MEMBERS file");
             ex.printStackTrace();
         }
     }
@@ -259,7 +283,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
             if (msg.isAdminMessage() && msg.isPersonal()) {
                 if ("forget".equalsIgnoreCase(cmd) || "нахер".equalsIgnoreCase(cmd)) {
-                    for (Nickname e: members) {
+                    for (Nickname e: members.values()) {
                         if (e.toString().equals(params) || e.toString().equals(NewWorld.NICK_PREFIX+params)) {
                             members.remove(e);
                             sayOk[0] = true;
@@ -456,7 +480,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
     public Nickname randomNick() {
         int rPos = RDBResource.RNG.nextInt(members.size());
-        return (Nickname)(members.toArray()[rPos]);
+        return (Nickname)(members.values().toArray()[rPos]);
     }
 
     private static String toJson(Update u) {
@@ -526,7 +550,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
         // adddate
         //bot.chanserv(-1001082390874L, new Nickname("ncuxonycbka", true), "@rottenbot2018_bot adddate 09/01/2018 added adddate");
-        bot.chanserv(-1001082390874L, new Nickname("zloy", true), "123");
+        bot.chanserv(-1001082390874L, new Nickname(123, "zloy2", true), "123");
 
         // Inner RDB - 2019
         //String s = bot.rdbDeep(" sigh worgjoijrpgja 140  *Г24 ${dateprefix1}again");
