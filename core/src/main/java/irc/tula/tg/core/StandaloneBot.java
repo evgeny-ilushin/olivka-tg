@@ -17,9 +17,11 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -241,7 +243,12 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
     }
 
     private void saveState() {
-        mapper.write(MEMBERS_CACHE, members.values());
+        try {
+            new File(MEMBERS_CACHE).delete();
+            mapper.write(MEMBERS_CACHE, members.values());
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void loadState() {
