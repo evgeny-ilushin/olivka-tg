@@ -287,6 +287,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                         if (e.toString().equals(params) || e.toString().equals(NewWorld.NICK_PREFIX+params)) {
                             members.remove(e);
                             sayOk[0] = true;
+                            saveState();
                             break;
                         }
                     }
