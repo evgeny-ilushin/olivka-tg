@@ -99,6 +99,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             if (c.isPresent()) {
                 StandaloneBot bot = new StandaloneBot(c.get());
                 log.info("Starting bot using {} ...", cfgPath);
+                log.info("Starting bot using {} ...", cfgPath);
 
                 if (bot.getConfig().isDebug()) {
                     my_tests(bot);
@@ -285,7 +286,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                 if ("forget".equalsIgnoreCase(cmd) || "нахер".equalsIgnoreCase(cmd)) {
                     for (Nickname e: members.values()) {
                         if (e.toString().equals(params) || e.toString().equals(NewWorld.NICK_PREFIX+params)) {
-                            members.remove(e);
+                            members.remove(e.getId());
                             sayOk[0] = true;
                             saveState();
                             break;
