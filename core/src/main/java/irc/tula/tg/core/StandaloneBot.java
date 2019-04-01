@@ -546,6 +546,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
     private static void my_tests(StandaloneBot bot) {
         log.info("*** DEBUG MODE ***");
+        long CHAT = -1001082390874L;
 
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "wz");
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "123");
@@ -559,7 +560,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
         // adddate
         //bot.chanserv(-1001082390874L, new Nickname("ncuxonycbka", true), "@rottenbot2018_bot adddate 09/01/2018 added adddate");
-        bot.chanserv(-1001082390874L, new Nickname(123, "zloy", true), "123");
+        bot.typeOnChannel(CHAT);
+        //bot.chanserv(CHAT, new Nickname(123, "zloy", true), "123");
 
         // Inner RDB - 2019
         //String s = bot.rdbDeep(" sigh worgjoijrpgja 140  *Г24 ${dateprefix1}again");

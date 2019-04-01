@@ -3,7 +3,9 @@ package irc.tula.tg.core;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Message;
+import com.pengrad.telegrambot.model.request.ChatAction;
 import com.pengrad.telegrambot.model.request.ParseMode;
+import com.pengrad.telegrambot.request.SendChatAction;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SetWebhook;
 import com.pengrad.telegrambot.response.BaseResponse;
@@ -49,12 +51,27 @@ public class BotCore {
         }
     }
 
+    public void typeOnChannel(Long chatId) {
+        if (config.isDebug()) {
+            log.info("FAKE TYPEINFO: {}", chatId);
+        } else
+            {
+            try {
+                tg.execute(new SendChatAction(chatId, ChatAction.typing), null);
+            } catch (Exception ex) {
+                log.error("sayOnChannel: {}", ex);
+            }
+        }
+    }
+
     public Optional<Message> sayOnChannel(Long chatId, String text) {
         if (config.isDebug()) {
             log.info("FAKE SEND: {} {}", chatId, text);
             return Optional.empty();
         } else {
             // Typing notification
+            typeOnChannel(chatId);
+
             if (false) {
 
             }
