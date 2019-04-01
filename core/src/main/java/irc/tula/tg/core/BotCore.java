@@ -17,6 +17,8 @@ import java.util.Optional;
 
 @Slf4j
 public class BotCore {
+    private static final int LONG_SENTENSE = 20;
+
     @Getter
     protected final TelegramBot tg;
 
@@ -35,7 +37,11 @@ public class BotCore {
         tg.setUpdatesListener(cb);
 
         // Loop forever : )
-        while (true) { try { Thread.sleep(1000); } catch (Exception e) { log.error("System: {}", e); } }
+        while (true) { sleep(1000); }
+    }
+
+    public void sleep(int msec) {
+        try { Thread.sleep(msec); } catch (Exception e) { log.error("System: {}", e); }
     }
 
     public Optional<BaseResponse> cancelWebhook() {
@@ -58,6 +64,7 @@ public class BotCore {
             {
             try {
                 tg.execute(new SendChatAction(chatId, ChatAction.typing), null);
+                sleep(1000);
             } catch (Exception ex) {
                 log.error("sayOnChannel: {}", ex);
             }
@@ -69,11 +76,10 @@ public class BotCore {
             log.info("FAKE SEND: {} {}", chatId, text);
             return Optional.empty();
         } else {
+
             // Typing notification
-            typeOnChannel(chatId);
-
-            if (false) {
-
+            if (text != null && text.length() > LONG_SENTENSE) {
+                typeOnChannel(chatId);
             }
 
             try {
