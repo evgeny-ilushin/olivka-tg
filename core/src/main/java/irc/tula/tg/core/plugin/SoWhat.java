@@ -2,7 +2,6 @@ package irc.tula.tg.core.plugin;
 
 import irc.tula.tg.core.ChannelBot;
 import irc.tula.tg.core.entity.IncomingMessage;
-import irc.tula.tg.core.entity.Nickname;
 import irc.tula.tg.core.entity.DateInfoCollection;
 import irc.tula.tg.core.entity.DateItem;
 import org.apache.commons.lang3.StringUtils;

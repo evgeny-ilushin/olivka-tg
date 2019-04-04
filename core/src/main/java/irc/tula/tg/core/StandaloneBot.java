@@ -20,11 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -200,7 +197,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         nickName.notice();
 
         boolean my = false;
-        boolean adminSays = nickName.toString().equals(getConfig().getAdmin());
+        boolean adminSays = getConfig().isAdmin(nickName.toString());
 
         for (String s: getConfig().getNames()) {
             if (text.startsWith(s)) {
@@ -289,6 +286,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             String params = result[1];
             msg.setText(params);
 
+            // 1
             if (msg.isAdminMessage() && msg.isPersonal()) {
                 if ("forget".equalsIgnoreCase(cmd) || "нахер".equalsIgnoreCase(cmd)) {
                     for (Nickname e: members.values()) {
@@ -302,6 +300,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                 }
             }
 
+            // 2
             if (!sayOk[0] && msg.isPersonal() && "adddate".equalsIgnoreCase(cmd)) {
                 try {
                     Plugin soWhat = plugins.get(SoWhat.PLUGIN_NAME);
@@ -310,6 +309,15 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                         log.info("processCommand->{}", res);
                         sayOk[0] = res;
                     }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            // 3
+            if (!sayOk[0] && msg.isPersonal() && ("status".equalsIgnoreCase(cmd) || "статус".equalsIgnoreCase(cmd))) {
+                try {
+                        sayOk[0] = false;
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

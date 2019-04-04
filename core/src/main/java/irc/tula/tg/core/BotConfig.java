@@ -20,11 +20,14 @@ public class BotConfig {
 
     private String token;
 
-    private String admin;
-
+    private List<String> admins;
     private List<String> names;
 
     private boolean debug;
+
+    public boolean isAdmin(String nick) {
+        return (admins != null && admins.size() > 0 && admins.contains(nick));
+    }
 
     @Transient
     public String getDataDirName() {
@@ -48,6 +51,6 @@ public class BotConfig {
 
     @Transient
     public static BotConfig getSample() {
-        return new BotConfig("/home/mybot", "123123123:454564", "@murzambek", Arrays.asList("bot", "MyBot", "@my_bot_nick"), true);
+        return new BotConfig("/home/mybot", "123123123:454564", Arrays.asList("@murzambek", "@zloy"), Arrays.asList("bot", "MyBot", "@my_bot_nick"), true);
     }
 }
