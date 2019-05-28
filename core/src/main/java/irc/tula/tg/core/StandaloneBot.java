@@ -297,11 +297,13 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             if (msg.isAdminMessage() && msg.isPersonal()) {
                 if ("forget".equalsIgnoreCase(cmd) || "нахер".equalsIgnoreCase(cmd)) {
                     if ("all".equalsIgnoreCase(params) || "всех".equalsIgnoreCase(params)) {
+                        HashMap<Integer, Nickname> admins = new HashMap<Integer, Nickname>();
                         for (Nickname e : members.values()) {
-                            if (!getConfig().isAdmin(e.toString())) {
-                                members.remove(e.getId());
+                            if (getConfig().isAdmin(e.toString())) {
+                                admins.put(e.getId(), e);
                             }
                         }
+                        members = admins;
                         sayOk[0] = true;
                         saveState();
                     }
