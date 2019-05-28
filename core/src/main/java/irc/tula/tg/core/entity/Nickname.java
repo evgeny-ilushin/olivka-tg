@@ -31,6 +31,12 @@ public class Nickname {
     @JsonProperty("isUserName")
     private boolean isUserName;
 
+    @JsonProperty("totalMessages")
+    private Integer totalMessages;
+
+    @JsonProperty("isBot")
+    private boolean isBot;
+
     @JsonProperty("lastSeen")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date lastSeen;

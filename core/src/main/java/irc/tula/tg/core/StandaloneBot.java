@@ -38,6 +38,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
     //private static final String BOT_HOME = "/home/ec2-user/bin/bots/data";
 
+    private static final boolean meatOnSecondPhrase = true;
+
     private static final String INFO2 = "info2.db";
     private static final String DONNO_RDB = "donno";
 
@@ -134,12 +136,16 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             String nickName = from.username();
             Nickname nick;
 
-            // Bullshit
-            if (nickName == null) {
-                nickName = from.firstName();
-                nick = new Nickname(from.id(), nickName, false);
-            } else {
-                nick = new Nickname(from.id(), nickName, true);
+            nick = members.get(from.id());
+
+            if (nick == null) {
+                // Bullshit
+                if (nickName == null) {
+                    nickName = from.firstName();
+                    nick = new Nickname(from.id(), nickName, false);
+                } else {
+                    nick = new Nickname(from.id(), nickName, true);
+                }
             }
 
             // Ignore other bots?
@@ -178,7 +184,11 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         String replyNickName = nickName.toString();
         Integer from_id = nickName.getId();
 
+        // Last seen
+        nickName.notice();
+
         Nickname nCache = members.get(from_id);
+
         if (nCache != null) {
             // Already seen
             if (!(""+nCache).equals(""+nickName)) {
@@ -192,9 +202,6 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             sayOnChannel(chatId, "теперь я знаю " + nickName + " \uD83D\uDE0E");
             saveState();
         }
-
-        // Last seen
-        nickName.notice();
 
         boolean my = false;
         boolean adminSays = getConfig().isAdmin(nickName.toString());
@@ -289,12 +296,23 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             // 1
             if (msg.isAdminMessage() && msg.isPersonal()) {
                 if ("forget".equalsIgnoreCase(cmd) || "нахер".equalsIgnoreCase(cmd)) {
-                    for (Nickname e: members.values()) {
-                        if (e.toString().equals(params) || e.toString().equals(NewWorld.NICK_PREFIX+params)) {
-                            members.remove(e.getId());
-                            sayOk[0] = true;
-                            saveState();
-                            break;
+                    if ("all".equalsIgnoreCase(params) || "всех".equalsIgnoreCase(params)) {
+                        for (Nickname e : members.values()) {
+                            if (!getConfig().isAdmin(e.toString())) {
+                                members.remove(e.getId());
+                            }
+                        }
+                        sayOk[0] = true;
+                        saveState();
+                    }
+                    else {
+                        for (Nickname e : members.values()) {
+                            if (e.toString().equals(params) || e.toString().equals(NewWorld.NICK_PREFIX + params)) {
+                                members.remove(e.getId());
+                                sayOk[0] = true;
+                                saveState();
+                                break;
+                            }
                         }
                     }
                 }
@@ -318,6 +336,16 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             if (!sayOk[0] && msg.isPersonal() && ("status".equalsIgnoreCase(cmd) || "статус".equalsIgnoreCase(cmd))) {
                 try {
                         sayOk[0] = false;
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            // 4
+            if (msg.isAdminMessage() && !sayOk[0] && msg.isPersonal() && ("клизма".equalsIgnoreCase(cmd) || "purge".equalsIgnoreCase(cmd))) {
+                try {
+                    sayOk[0] = true;
+                    //4444
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
