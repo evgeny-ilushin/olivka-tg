@@ -130,8 +130,25 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
     protected void onUpdate(Update update) {
         callbacks.add(toJson(update));
 
-        if (update.message() != null) {
-            Message m = update.message();
+        Message m = update.message();
+        String mt = "message";
+
+        if (m == null) {
+            m = update.editedMessage()
+            mt = "edited_message";
+        }
+        if (m == null) {
+            m = update.channelPost();
+            mt = "channel_post";
+        }
+        if (m == null) {
+            m = update.editedChannelPost();
+            mt = "edited_channel_post";
+        }
+
+        log.info("TG Update type: {}", mt);
+
+        if (m != null) {
             User from = m.from();
             String nickName = from.username();
             Nickname nick;
@@ -619,5 +636,9 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "гнилой, скажи частушку");
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "гнилой, 1234");
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "1");
+
+        String pl_dev = "{ \"update_id\":\"18322330\", \"message\":\"null\", \"edited_message\":\"null\", \"channel_post\":\"Message{message_id=6, from=null, date=1565769547, chat=Chat{id=-1001343308314, type=channel, first_name='null', last_name='null', username='olivka_dev', title='olivka development', all_members_are_administrators=null, photo=null, description='null', invite_link='null', pinned_message=null, sticker_set_name='null', can_set_sticker_set=null}, forward_from=null, forward_from_chat=null, forward_from_message_id=null, forward_signature='null', forward_date=null, reply_to_message=null, edit_date=null, media_group_id='null', author_signature='null', text='1', entities=null, caption_entities=null, audio=null, document=null, animation=null, game=null, photo=null, sticker=null, video=null, voice=null, video_note=null, caption='null', contact=null, location=null, venue=null, new_chat_member=null, new_chat_members=null, left_chat_member=null, new_chat_title='null', new_chat_photo=null, delete_chat_photo=null, group_chat_created=null, supergroup_chat_created=null, channel_chat_created=null, migrate_to_chat_id=null, migrate_from_chat_id=null, pinned_message=null, invoice=null, successful_payment=null, connected_website='null', passport_data=null}\", \"edited_channel_post\":\"null\", \"inline_query\":\"null\", \"chosen_inline_result\":\"null\", \"callback_query\":\"null\", \"shipping_query\":\"null\", \"pre_checkout_query\":\"null\" }";
+        String pl_prod = "{ \"update_id\":\"18322331\", \"message\":\"Message{message_id=401037, from=User{id=412132074, is_bot=false, first_name='ncuxonycbka', last_name='null', username='ncuxonycbka', language_code='en'}, date=1565769632, chat=Chat{id=-1001082390874, type=supergroup, first_name='null', last_name='null', username='tulairc', title='irc.tula.net', all_members_are_administrators=null, photo=null, description='null', invite_link='null', pinned_message=null, sticker_set_name='null', can_set_sticker_set=null}, forward_from=null, forward_from_chat=null, forward_from_message_id=null, forward_signature='null', forward_date=null, reply_to_message=null, edit_date=null, media_group_id='null', author_signature='null', text='2', entities=null, caption_entities=null, audio=null, document=null, animation=null, game=null, photo=null, sticker=null, video=null, voice=null, video_note=null, caption='null', contact=null, location=null, venue=null, new_chat_member=null, new_chat_members=null, left_chat_member=null, new_chat_title='null', new_chat_photo=null, delete_chat_photo=null, group_chat_created=null, supergroup_chat_created=null, channel_chat_created=null, migrate_to_chat_id=null, migrate_from_chat_id=null, pinned_message=null, invoice=null, successful_payment=null, connected_website='null', passport_data=null}\", \"edited_message\":\"null\", \"channel_post\":\"null\", \"edited_channel_post\":\"null\", \"inline_query\":\"null\", \"chosen_inline_result\":\"null\", \"callback_query\":\"null\", \"shipping_query\":\"null\", \"pre_checkout_query\":\"null\" }";
+        String p1_dev1 = "{ \"update_id\":\"18322332\", \"message\":\"null\", \"edited_message\":\"null\", \"channel_post\":\"Message{message_id=7, from=null, date=1565769693, chat=Chat{id=-1001343308314, type=channel, first_name='null', last_name='null', username='olivka_dev', title='olivka development', all_members_are_administrators=null, photo=null, description='null', invite_link='null', pinned_message=null, sticker_set_name='null', can_set_sticker_set=null}, forward_from=null, forward_from_chat=null, forward_from_message_id=null, forward_signature='null', forward_date=null, reply_to_message=null, edit_date=null, media_group_id='null', author_signature='null', text='2', entities=null, caption_entities=null, audio=null, document=null, animation=null, game=null, photo=null, sticker=null, video=null, voice=null, video_note=null, caption='null', contact=null, location=null, venue=null, new_chat_member=null, new_chat_members=null, left_chat_member=null, new_chat_title='null', new_chat_photo=null, delete_chat_photo=null, group_chat_created=null, supergroup_chat_created=null, channel_chat_created=null, migrate_to_chat_id=null, migrate_from_chat_id=null, pinned_message=null, invoice=null, successful_payment=null, connected_website='null', passport_data=null}\", \"edited_channel_post\":\"null\", \"inline_query\":\"null\", \"chosen_inline_result\":\"null\", \"callback_query\":\"null\", \"shipping_query\":\"null\", \"pre_checkout_query\":\"null\" }";
     }
 }
