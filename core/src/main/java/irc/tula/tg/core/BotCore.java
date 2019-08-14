@@ -5,9 +5,7 @@ import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.request.ChatAction;
 import com.pengrad.telegrambot.model.request.ParseMode;
-import com.pengrad.telegrambot.request.SendChatAction;
-import com.pengrad.telegrambot.request.SendMessage;
-import com.pengrad.telegrambot.request.SetWebhook;
+import com.pengrad.telegrambot.request.*;
 import com.pengrad.telegrambot.response.BaseResponse;
 import com.pengrad.telegrambot.response.SendResponse;
 import lombok.Getter;
@@ -67,6 +65,20 @@ public class BotCore {
                 sleep(1000);
             } catch (Exception ex) {
                 log.error("sayOnChannel: {}", ex);
+            }
+        }
+    }
+
+    public void sendImageToChat(Long chatId, String pathToFile) {
+        if (config.isDebug()) {
+            log.info("IMAGE -> {}: {}", chatId, pathToFile);
+        } else
+        {
+            try {
+                BaseRequest a = new SendPhoto(chatId, pathToFile);
+                tg.execute(a, null);
+            } catch (Exception ex) {
+                log.error("sendImageToChat: {}", ex);
             }
         }
     }

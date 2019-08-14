@@ -11,6 +11,7 @@ import irc.tula.tg.core.entity.IncomingMessage;
 import irc.tula.tg.core.entity.Nickname;
 import irc.tula.tg.core.plugin.Plugin;
 import irc.tula.tg.core.plugin.SoWhat;
+import irc.tula.tg.core.plugin.YWeather;
 import irc.tula.tg.util.ExecCommand;
 import irc.tula.tg.util.TextLog;
 import lombok.Getter;
@@ -124,6 +125,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
     private void loadPlugins() {
         addPlugin(new SoWhat());
+        addPlugin(new YWeather());
         plugins.forEach((k,v) -> v.initialize(this));
     }
 
@@ -137,6 +139,9 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             m = update.editedMessage();
             mt = "edited_message";
         }
+
+        // Not supported yet
+        /*
         if (m == null) {
             m = update.channelPost();
             mt = "channel_post";
@@ -145,6 +150,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             m = update.editedChannelPost();
             mt = "edited_channel_post";
         }
+        */
 
         log.info("TG Update type: {}", mt);
 
@@ -603,7 +609,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         log.info("*** DEBUG MODE ***");
         long CHAT = -1001082390874L;
 
-        //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "wz");
+        bot.chanserv(-1001082390874L, new Nickname(1, "zloy", true), "333");
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "123");
 
         // Dec 26/2018
@@ -615,7 +621,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
         // adddate
         //bot.chanserv(-1001082390874L, new Nickname("ncuxonycbka", true), "@rottenbot2018_bot adddate 09/01/2018 added adddate");
-        bot.typeOnChannel(CHAT);
+        //bot.typeOnChannel(CHAT);
         //bot.chanserv(CHAT, new Nickname(123, "zloy", true), "123");
 
         // Inner RDB - 2019
