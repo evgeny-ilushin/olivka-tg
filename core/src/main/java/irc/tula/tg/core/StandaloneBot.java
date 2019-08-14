@@ -134,7 +134,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         String mt = "message";
 
         if (m == null) {
-            m = update.editedMessage()
+            m = update.editedMessage();
             mt = "edited_message";
         }
         if (m == null) {
