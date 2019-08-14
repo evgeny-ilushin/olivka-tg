@@ -41,6 +41,7 @@ public class YWeather implements Plugin {
 
     @Override
     public boolean process(ChannelBot bot, IncomingMessage msg, String pluginName) {
+        bot.typeOnChannel(msg.getChatId());
         String img = callScript(bot, msg, "y-weather");
         if (img != null) {
             log.info("Script response: {}", img);

@@ -11,6 +11,7 @@ import java.util.Optional;
 
 public interface ChannelBot {
     Optional<Message> sayOnChannel(Long chatId, String text);
+    void typeOnChannel(Long chatId);
     void sendImageToChat(Long chatId, String pathToFile);
     void answerText(IncomingMessage msg, String reply);
     void answerDonno(IncomingMessage msg);
