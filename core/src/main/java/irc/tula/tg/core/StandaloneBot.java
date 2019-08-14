@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Slf4j
 public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBot {
@@ -473,13 +474,23 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         }
     }
 
-    private void answerPlugin(IncomingMessage msg, String pluginName) {
+    private void answerPlugin(IncomingMessage msg, String text) {
+        String pluginName = text;
+        String params = null;
+
         log.info("answerPlugin: {} {}", msg, pluginName);
 
         try {
+                String[] parts = text.split(" ");
+
+                if (parts != null && parts.length > 1) {
+                    pluginName = parts[0];
+                    params = parts[1];
+                }
+
                 Plugin p = plugins.get(pluginName);
                 if (p != null) {
-                    boolean res = p.process(this, msg, pluginName);
+                    boolean res = p.process(this, msg, pluginName, params);
                     log.info("answerPlugin->{}", res);
                 }
         } catch (Exception ex) {

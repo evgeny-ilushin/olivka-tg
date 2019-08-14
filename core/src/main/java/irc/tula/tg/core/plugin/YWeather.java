@@ -40,9 +40,9 @@ public class YWeather implements Plugin {
     }
 
     @Override
-    public boolean process(ChannelBot bot, IncomingMessage msg, String pluginName) {
+    public boolean process(ChannelBot bot, IncomingMessage msg, String pluginName, String params) {
         bot.typeOnChannel(msg.getChatId());
-        String img = callScript(bot, msg, "y-weather");
+        String img = callScript(bot, msg, "y-weather", params);
         if (img != null) {
             log.info("Script response: {}", img);
             bot.sendImageToChat(msg.getChatId(), img);
@@ -64,7 +64,7 @@ public class YWeather implements Plugin {
 
     }
 
-    private String callScript(ChannelBot bot, IncomingMessage msg, String scriptName) {
+    private String callScript(ChannelBot bot, IncomingMessage msg, String scriptName, String params) {
         log.info("callScript: {} {}", msg, scriptName);
         String sres = null;
 
@@ -75,7 +75,8 @@ public class YWeather implements Plugin {
                 return sres;
             }
 
-            ExecCommand ec = new ExecCommand(binary);
+            ExecCommand ec = params == null? new ExecCommand(binary) :
+                new ExecCommand(new String[]{binary, params});
             Thread.sleep(100);
             //ec.getOutput();
             String res = ec.output;

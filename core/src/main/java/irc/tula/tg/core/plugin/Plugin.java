@@ -9,7 +9,7 @@ public interface Plugin {
     String getName();
     List<String> getNames();
     void initialize(ChannelBot bot);
-    boolean process(ChannelBot bot, IncomingMessage msg, String pluginName);
+    boolean process(ChannelBot bot, IncomingMessage msg, String pluginName, String params);
     boolean processCommand(ChannelBot bot, String cmd, String params, IncomingMessage msg, String pluginName);
     void release(ChannelBot bot);
 }

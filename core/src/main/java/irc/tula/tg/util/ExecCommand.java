@@ -80,6 +80,17 @@ public class ExecCommand {
         }
     }
 
+    public ExecCommand(String[] commands) {
+        try {
+            p = Runtime.getRuntime().exec(commands);
+            new OutputReader().start();
+            new ErrorReader().start();
+            p.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public String getOutput() {
         try {
             outputSem.acquireUninterruptibly();
