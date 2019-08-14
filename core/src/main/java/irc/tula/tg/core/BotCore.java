@@ -10,6 +10,7 @@ import com.pengrad.telegrambot.response.BaseResponse;
 import com.pengrad.telegrambot.response.SendResponse;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 import java.util.Optional;
 
@@ -76,7 +77,8 @@ public class BotCore {
         {
             try {
                 BaseRequest a = new SendPhoto(chatId, pathToFile);
-                tg.execute(a, null);
+                val res = tg.execute(a);
+                log.info("TG.send: {}", res);
             } catch (Exception ex) {
                 log.error("sendImageToChat: {}", ex);
             }
