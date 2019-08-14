@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
+import java.io.File;
 import java.util.Optional;
 
 @Slf4j
@@ -76,9 +77,11 @@ public class BotCore {
         } else
         {
             try {
-                BaseRequest a = new SendPhoto(chatId, pathToFile);
-                val res = tg.execute(a);
-                log.info("TG.send: {}", res);
+                BaseRequest a = new SendPhoto(chatId, new File(pathToFile));
+                val sendResponse = tg.execute(a);
+                boolean ok = sendResponse.isOk();
+
+                log.info("TG.send: {}", sendResponse);
             } catch (Exception ex) {
                 log.error("sendImageToChat: {}", ex);
             }
