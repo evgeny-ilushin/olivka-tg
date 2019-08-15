@@ -11,6 +11,7 @@ import irc.tula.tg.core.entity.IncomingMessage;
 import irc.tula.tg.core.entity.Nickname;
 import irc.tula.tg.core.plugin.Plugin;
 import irc.tula.tg.core.plugin.SoWhat;
+import irc.tula.tg.core.plugin.WebCap;
 import irc.tula.tg.core.plugin.YWeather;
 import irc.tula.tg.util.ExecCommand;
 import irc.tula.tg.util.TextLog;
@@ -22,6 +23,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -127,6 +129,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
     private void loadPlugins() {
         addPlugin(new SoWhat());
         addPlugin(new YWeather());
+        addPlugin(new WebCap());
         plugins.forEach((k,v) -> v.initialize(this));
     }
 
@@ -476,7 +479,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
     private void answerPlugin(IncomingMessage msg, String text) {
         String pluginName = text;
-        String params = null;
+        String[] params = null;
 
         log.info("answerPlugin: {} {}", msg, pluginName);
 
@@ -485,7 +488,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
                 if (parts != null && parts.length > 1) {
                     pluginName = parts[0];
-                    params = parts[1];
+                    params = Arrays.copyOfRange(parts, 1, parts.length);
                 }
 
                 Plugin p = plugins.get(pluginName);
@@ -620,7 +623,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         log.info("*** DEBUG MODE ***");
         long CHAT = -1001082390874L;
 
-        bot.chanserv(-1001082390874L, new Nickname(1, "zloy", true), "333");
+        bot.chanserv(-1001082390874L, new Nickname(1, "zloy", true), "444");
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "123");
 
         // Dec 26/2018

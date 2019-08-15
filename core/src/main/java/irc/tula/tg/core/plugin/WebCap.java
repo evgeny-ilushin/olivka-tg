@@ -9,14 +9,15 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
-public class YWeather implements Plugin {
+public class WebCap implements Plugin {
 
-    private static final String NAME = "yweather";
-    public static final String[] ALIASES = { "weather", "ywz" };
+    private static final String NAME = "webcap";
+    public static final String[] ALIASES = { "wcap", "wc" };
 
     private static final String DONNO_RDB = "donno";
 
@@ -42,7 +43,7 @@ public class YWeather implements Plugin {
     @Override
     public boolean process(ChannelBot bot, IncomingMessage msg, String pluginName, String[] params) {
         bot.typeOnChannel(msg.getChatId());
-        String img = callScript(bot, msg, "y-weather", params);
+        String img = callWcScript(bot, msg, "webcap", params);
         if (img != null) {
             log.info("Script response: {}", img);
             bot.sendImageToChat(msg.getChatId(), img);
@@ -64,19 +65,23 @@ public class YWeather implements Plugin {
 
     }
 
-    private String callScript(ChannelBot bot, IncomingMessage msg, String scriptName, String[] params) {
+    private String callWcScript(ChannelBot bot, IncomingMessage msg, String scriptName, String[] params) {
         log.info("callScript: {} {}", msg, scriptName);
         String sres = null;
 
         String binary = bot.getConfig().getScriptDir(scriptName + NewWorld.SCRIPT_SUFFIX);
         try {
             if (!Files.exists(Paths.get(binary))) {
-                log.error("WzScript not found: {}", binary);
+                log.error("WcScript not found: {}", binary);
                 return sres;
             }
 
+            ArrayList<String> cp = new ArrayList<>();
+            cp.add(binary);
+            cp.addAll(Arrays.asList(params));
+            String[] args = cp.toArray(new String[cp.size()]);
             ExecCommand ec = params == null? new ExecCommand(binary) :
-                new ExecCommand(new String[]{binary, params[0]});
+                new ExecCommand(cp.toArray(new String[cp.size()]));
             Thread.sleep(100);
             //ec.getOutput();
             String res = ec.output;

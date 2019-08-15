@@ -60,7 +60,7 @@ public class SoWhat implements Plugin {
     public void release(ChannelBot bot) {}
 
     @Override
-    public boolean process(ChannelBot bot, IncomingMessage msg, String pluginName, String params) {
+    public boolean process(ChannelBot bot, IncomingMessage msg, String pluginName, String[] params) {
         final Calendar now = Calendar.getInstance();
         List<DateItem> today = new ArrayList<>();
         boolean personal = false;
