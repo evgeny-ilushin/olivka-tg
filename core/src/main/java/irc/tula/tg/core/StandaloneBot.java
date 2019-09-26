@@ -106,7 +106,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                 log.info("Starting bot using {} ...", cfgPath);
                 log.info("Starting bot using {} ...", cfgPath);
 
-                if (bot.getConfig().isDebug()) {
+                if (bot.getConfig().isRunTests()) {
                     my_tests(bot);
                 }
                 else {

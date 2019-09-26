@@ -24,6 +24,7 @@ public class BotConfig {
     private List<String> names;
 
     private boolean debug;
+    private boolean runTests = false;
 
     public boolean isAdmin(String nick) {
         return (admins != null && admins.size() > 0 && admins.contains(nick));
@@ -51,6 +52,6 @@ public class BotConfig {
 
     @Transient
     public static BotConfig getSample() {
-        return new BotConfig("/home/mybot", "123123123:454564", Arrays.asList("@murzambek", "@zloy"), Arrays.asList("bot", "MyBot", "@my_bot_nick"), true);
+        return new BotConfig("/home/mybot", "123123123:454564", Arrays.asList("@murzambek", "@zloy"), Arrays.asList("bot", "MyBot", "@my_bot_nick"), true, false);
     }
 }
