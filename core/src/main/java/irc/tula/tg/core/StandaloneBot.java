@@ -1,5 +1,7 @@
 package irc.tula.tg.core;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
@@ -23,10 +25,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 @Slf4j
@@ -48,6 +49,9 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
     private static final String DONNO_RDB = "donno";
 
     private static final String MEMBERS_CACHE = "members.json";
+
+    // Answered messages
+    Cache<String, String> msgCache = null;
 
     public BotConfig getConfig() { return config; }
 
@@ -79,6 +83,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         mapper = new JsonObjectMapper(getConfig().getDataDirName());
         loadState();
         loadPlugins();
+        loadCore();
     }
 
     public static void main(String[] args) {
@@ -133,8 +138,67 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         plugins.forEach((k,v) -> v.initialize(this));
     }
 
-    protected void onUpdate(Update update) {
+    private void loadCore() {
+        Cache<String, String> msgCache = CacheBuilder.newBuilder()
+                .maximumSize(10000)
+                .expireAfterWrite(10, TimeUnit.MINUTES)
+                .build();
+
+        log.info("### MSG Cache created: {}", msgCache.stats());
+    }
+
+    protected boolean wasAnsweredRecently(Update update) {
+        Integer id = idOf(update);
+
+        if (msgCache != null && id != null) {
+
+            try {
+                String res = msgCache.get(""+id, new Callable<String>() {
+                    @Override
+                    public String call() throws Exception {
+                        return null;
+                    }
+                });
+                if (res != null) {
+                    log.info("### MSG Cache: {} was already answered", id);
+                    return true;
+                }
+            } catch (Exception e) {
+                log.error("error: {}", e);
+
+            }
+        }
+        return false;
+    }
+
+    protected void addToAnsweredCache(Update update) {
+        Integer id = idOf(update);
+
+        if (msgCache != null && id != null) {
+            log.info("### MSG Cache: adding {} to answered", id);
+            msgCache.put("" + id, ""+ new Date());
+        }
+    }
+
+    protected Integer idOf(Update update) {
+        if (update.message() != null) {
+            return update.message().messageId();
+        }
+        if (update.editedMessage() != null) {
+            return update.editedMessage().messageId();
+        }
+        if (update.channelPost() != null) {
+            return update.channelPost().messageId();
+        }
+        if (update.editedChannelPost() != null) {
+            return update.editedChannelPost().messageId();
+        }
+        return null;
+    }
+
+    protected boolean onUpdate(Update update) {
         callbacks.add(toJson(update));
+        boolean answered = false;
 
         Message m = update.message();
         String mt = "message";
@@ -142,6 +206,12 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         if (m == null) {
             m = update.editedMessage();
             mt = "edited_message";
+        }
+
+        // Check if already answered
+        if (wasAnsweredRecently(update)) {
+            log.info("### Question was already answered.");
+            return false;
         }
 
         // Not supported yet
@@ -186,10 +256,14 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
                 // I am text only
                 if (m.text() != null) {
-                    chanserv(replyChatId, nick, m.text());
+                    answered = chanserv(replyChatId, nick, m.text());
+                    if (answered) {
+                        addToAnsweredCache(update);
+                    }
                 }
             }
         }
+        return answered;
     }
 
     private void processUpdate(Update update) {
@@ -206,7 +280,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
 
-    private void chanserv(Long chatId, Nickname nickName, String text) {
+    private boolean chanserv(Long chatId, Nickname nickName, String text) {
+        boolean answered = false;
         log.info("chanserv: ({}, {}, {})", chatId, nickName, text);
         String replyNickName = nickName.toString();
         Integer from_id = nickName.getId();
@@ -253,24 +328,27 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
         // Admin commands
         if (processCommand(msg)) {
-            return;
+            return true;
         }
 
         // Something else
         Optional<Info2Record> rep = info2.firstMatch(text);
         if (rep.isPresent()) {
             answerInfo2Match(msg, rep.get());
+            answered = true;
         } else {
             if (my) {
                 log.info("Personal message in chat: {}", text);
                 rep = info2.firstMatch(text.trim());
                 if (rep.isPresent()) {
                     answerInfo2Match(msg, rep.get());
+                    answered = true;
                 } else {
                     answerDonno(msg);
                 }
             }
         }
+        return answered;
     }
 
     private void saveState() {
@@ -623,7 +701,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         log.info("*** DEBUG MODE ***");
         long CHAT = -1001082390874L;
 
-        bot.chanserv(-1001082390874L, new Nickname(1, "zloy", true), "444");
+        boolean csRes = bot.chanserv(-1001082390874L, new Nickname(1, "zloy", true), "444");
+
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "123");
 
         // Dec 26/2018
