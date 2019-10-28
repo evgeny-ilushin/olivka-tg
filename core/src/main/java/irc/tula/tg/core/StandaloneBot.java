@@ -139,7 +139,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
     }
 
     private void loadCore() {
-        Cache<String, String> msgCache = CacheBuilder.newBuilder()
+        msgCache = CacheBuilder.newBuilder()
                 .maximumSize(10000)
                 .expireAfterWrite(10, TimeUnit.MINUTES)
                 .build();
@@ -156,7 +156,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                 String res = msgCache.get(""+id, new Callable<String>() {
                     @Override
                     public String call() throws Exception {
-                        return null;
+                        throw new Exception();
                     }
                 });
                 if (res != null) {
@@ -164,8 +164,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                     return true;
                 }
             } catch (Exception e) {
-                log.error("error: {}", e);
-
+                //log.error("error: {}", e);
             }
         }
         return false;
@@ -193,6 +192,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         if (update.editedChannelPost() != null) {
             return update.editedChannelPost().messageId();
         }
+        //return new Integer(0);
         return null;
     }
 
@@ -700,6 +700,13 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
     private static void my_tests(StandaloneBot bot) {
         log.info("*** DEBUG MODE ***");
         long CHAT = -1001082390874L;
+
+        Update u = new Update();
+
+        bot.loadCore();
+        boolean r = bot.wasAnsweredRecently(u);
+        bot.addToAnsweredCache(u);
+        r = bot.wasAnsweredRecently(u);
 
         boolean csRes = bot.chanserv(-1001082390874L, new Nickname(1, "zloy", true), "444");
 
