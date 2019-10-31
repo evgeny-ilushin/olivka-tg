@@ -441,7 +441,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             }
 
             // 2.1
-            if (!sayOk[0] /* && msg.isPersonal() */ && "пробей".equalsIgnoreCase(cmd)) {
+            if (!sayOk[0] && msg.isPersonal()  && "пробей".equalsIgnoreCase(cmd)) {
                 try {
                     log.info("processCommand->{}");
                     //sayOk[0] = true;
