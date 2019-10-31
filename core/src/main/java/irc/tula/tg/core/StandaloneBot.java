@@ -387,6 +387,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         log.info("processCommand: {}", msg);
         final boolean[] sayOk = { false };
         boolean done = false;
+        String sayOkText = "ok";
 
         try {
             String[] result = msg.getText().trim().split(" ", 2);
@@ -439,6 +440,18 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                 }
             }
 
+            // 2.1
+            if (!sayOk[0] /* && msg.isPersonal() */ && "пробей".equalsIgnoreCase(cmd)) {
+                try {
+                    log.info("processCommand->{}");
+                    //sayOk[0] = true;
+                    //sayOkText =
+                    answerScriptEx(msg, "mlookup", params);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+
             // 3
             if (!sayOk[0] && msg.isPersonal() && ("status".equalsIgnoreCase(cmd) || "статус".equalsIgnoreCase(cmd))) {
                 try {
@@ -459,7 +472,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             }
 
             if (sayOk[0]) {
-                String reply = msg.getNickName() + NewWorld.NICK_SEPARATOR + "ok";
+                String reply = msg.getNickName() + NewWorld.NICK_SEPARATOR + sayOkText;
                 sayOnChannel(msg.getChatId(), reply);
                 return true;
             }
@@ -534,6 +547,42 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             while (numAttempts > 0) {
                 try {
                     ExecCommand ec = new ExecCommand(binary);
+                    Thread.sleep(100);
+                    //ec.getOutput();
+                    String res = ec.output;
+                    if (StringUtils.isNotBlank(res)) {
+                        res = msg.getNickName() + NewWorld.NICK_SEPARATOR + res;
+                        sayOnChannel(msg.getChatId(), res);
+                        numAttempts = 0;
+                    } else {
+                        log.error("answerScript zero reply, retry: " + numAttempts);
+                        numAttempts--;
+                        Thread.sleep(500);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void answerScriptEx(IncomingMessage msg, String scriptName, String params) {
+        log.info("answerScriptEx: {} {}", msg, scriptName);
+
+        String binary = getConfig().getScriptDir(scriptName + NewWorld.SCRIPT_SUFFIX);
+        try {
+            if (!Files.exists(Paths.get(binary))) {
+                log.error("Script not found: {}", binary);
+                return;
+            }
+
+            int numAttempts = 3; // : )
+
+            while (numAttempts > 0) {
+                try {
+                    ExecCommand ec = new ExecCommand(binary + " " + params);
                     Thread.sleep(100);
                     //ec.getOutput();
                     String res = ec.output;
@@ -708,7 +757,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         bot.addToAnsweredCache(u);
         r = bot.wasAnsweredRecently(u);
 
-        boolean csRes = bot.chanserv(-1001082390874L, new Nickname(1, "zloy", true), "444");
+        //boolean csRes = bot.chanserv(-1001082390874L, new Nickname(1, "zloy", true), "444");
+        boolean csRes = bot.chanserv(-1001082390874L, new Nickname(1, "zloy", true), "пробей yf +79028472038");
 
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "123");
 
