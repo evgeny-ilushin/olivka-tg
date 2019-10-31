@@ -444,12 +444,14 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             if (!sayOk[0] && msg.isPersonal()  && "пробей".equalsIgnoreCase(cmd)) {
                 try {
                     log.info("processCommand->{}");
-                    //sayOk[0] = true;
+                    sayOk[0] = true;
                     //sayOkText =
                     answerScriptEx(msg, "mlookup", params);
                 } catch (Exception ex) {
                     ex.printStackTrace();
+                    answerDonno(msg);
                 }
+                return true;
             }
 
             // 3
@@ -758,7 +760,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         r = bot.wasAnsweredRecently(u);
 
         //boolean csRes = bot.chanserv(-1001082390874L, new Nickname(1, "zloy", true), "444");
-        boolean csRes = bot.chanserv(-1001082390874L, new Nickname(1, "zloy", true), "пробей yf +79028472038");
+        boolean csRes = bot.chanserv(-1001082390874L, new Nickname(1, "zloy", true), "пробей +79028472038");
 
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "123");
 
