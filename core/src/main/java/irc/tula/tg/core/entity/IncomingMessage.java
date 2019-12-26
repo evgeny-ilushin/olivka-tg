@@ -13,6 +13,8 @@ public class IncomingMessage {
     @NonNull boolean isPersonal;
     @NonNull boolean isAdminMessage;
 
+    boolean wasTrimmedToParams = false;
+
     final Date ts = new Date();
 
     @Override

@@ -397,7 +397,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
             String cmd = result[0];
             String params = result[1];
-            msg.setText(params);
+            msg.setText(params.trim());
+            msg.setWasTrimmedToParams(true);
 
             // 1
             if (msg.isAdminMessage() /* && msg.isPersonal() */ ) {
@@ -515,6 +516,14 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         }
 
         // Not an RDB
+        if (answerDonno && inforec.getValue().length() > 2 && inforec.getValue().charAt(0) == Cave.SCRIPT_PREFIX && inforec.getValue().charAt(1) == Cave.SCRIPT_PREFIX) {
+            // Script with params output
+            if (StringUtils.isNotBlank(msg.getText()) && msg.getText().trim().length() > 1 && msg.isWasTrimmedToParams()) {
+                answerScriptEx(msg, inforec.getValue().substring(2), msg.getText());
+            }
+            answerDonno = false;
+        }
+
         if (answerDonno && inforec.getValue().length() > 1 && inforec.getValue().charAt(0) == Cave.SCRIPT_PREFIX) {
             // Script output
             answerScript(msg, inforec.getValue().substring(1));
@@ -760,7 +769,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         r = bot.wasAnsweredRecently(u);
 
         //boolean csRes = bot.chanserv(-1001082390874L, new Nickname(1, "zloy", true), "444");
-        boolean csRes = bot.chanserv(-1001082390874L, new Nickname(1, "zloy", true), "пробей +79028472038");
+        //boolean csRes = bot.chanserv(-1001082390874L, new Nickname(1, "zloy", true), "!ru  cow");
+        boolean csRes = bot.chanserv(-1001082390874L, new Nickname(1, "zloy", true), "!en  свинья");
 
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "123");
 
