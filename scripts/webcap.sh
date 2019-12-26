@@ -11,8 +11,8 @@ URL="$1"; shift
 CROP="$1"; shift
 PAMS="$@"
 
-DIR="/projects/olivka/telegram-2018/scripts"
-#DIR="/home/ec2-user/bin/bots/tmp"
+#DIR="/projects/olivka/telegram-2018/scripts"
+DIR="/home/ec2-user/bin/bots/tmp"
 
 if [ "_$URL" == "_" ]; then
     URL="$DURL"
@@ -23,18 +23,18 @@ cd "$DIR"
 
 PX=$(echo -n "$URL" | md5sum | tr -d ' ' | tr -d '-')
 
-echo "[URL : $URL]" > /dev/stderr
-echo "[MD5: $PX]" > /dev/stderr
-echo "[WS : $WS]" > /dev/stderr
-echo "[CROP : $CROP]" > /dev/stderr
-echo "[PAMS: $PAMS]" > /dev/stderr
+#echo "[URL : $URL]" > /dev/stderr
+#echo "[MD5: $PX]" > /dev/stderr
+#echo "[WS : $WS]" > /dev/stderr
+#echo "[CROP : $CROP]" > /dev/stderr
+#echo "[PAMS: $PAMS]" > /dev/stderr
 
 TG="webcap_$PX.png"
 
 
 # cache 5 min
 TTL=`perl -e 'printf "%d\n" ,(time()-((stat(shift))[9]))/60;' $TG`
-echo "[TTL: $TTL]" > /dev/stderr
+#echo "[TTL: $TTL]" > /dev/stderr
 if [[ $TTL -le 5 ]] ; then
     echo "$(pwd)/$TG"
     exit
@@ -45,9 +45,13 @@ rm -f screenshot.png "$TG"
 
 $HBIN --headless --screenshot \
     --window-size=$WS --default-background-color=0 \
-    "$URL"
+    "$URL" 2>/dev/null
 
-convert -crop $CROP screenshot.png $TG
+# Invert
+#convert -negate -crop $CROP screenshot.png $TG  2>/dev/null
+
+# Crop
+convert -crop $CROP screenshot.png $TG  2>/dev/null
 
 echo "$(pwd)/$TG"
 
