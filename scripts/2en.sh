@@ -10,5 +10,5 @@ echo "$(date) IN: $TEXT" >> $LOG
 echo "UTF: $TEXT" >> $LOG
 
 
-node /projects/linux/google-translate/2en.js "$TEXT" | tee -a $LOG
+node /home/ec2-user/bin/bots/olivka-tg/scripts/2en.js "$TEXT" | tee -a $LOG
 

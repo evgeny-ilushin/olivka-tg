@@ -11,10 +11,10 @@ echo "$(date) IN: $TEXT" >> $LOG
 echo "UTF: $TEXT" >> $LOG
 
 
-R="$(node 2ua.js $TEXT)"
+R="$(node /home/ec2-user/bin/bots/olivka-tg/scripts/2ua.js $TEXT)"
 
 if [[ "$R" =~ ^\(uk\).* ]]; then
-    R="$(node 2uar.js $TEXT)"
+    R="$(node /home/ec2-user/bin/bots/olivka-tg/scripts/2uar.js $TEXT)"
 fi;
 
 #R="$(echo $R | iconv -t 'windows-1251' -f 'utf-8')"

@@ -10,7 +10,7 @@ echo "$(date) IN: $TEXT" >> $LOG
 echo "UTF: $TEXT" >> $LOG
 
 
-R="$(node /projects/linux/google-translate/2ru.js $TEXT)"
+R="$(node /home/ec2-user/bin/bots/olivka-tg/scripts/2ru.js $TEXT)"
 
 #R="$(echo $R | iconv -t 'windows-1251' -f 'utf-8')"
 

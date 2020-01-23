@@ -5,13 +5,13 @@
 MDN=$@
 
 #DB=/home/ec2-user/bin/bots/data/mcclookup.csv
-#T=dev1
-#KEY=~/nm-dev.pem
+DB=/home/ec2-user/bin/bots/olivka-tg/data/csv/mcclookup.csv
+T=dev1
+KEY=~/nm-dev.pem
 
 #DB=/home/zloy/Documents/nm/mcclookup.csv
-DB=/projects/olivka/telegram-2018/olivka-tg/data/csv/mcclookup.csv
-T=52.44.33.68
-KEY=/home/zloy/Downloads/nm-dev.pem
+#T=52.44.33.68
+#KEY=/home/zloy/Downloads/nm-dev.pem
 
 
 if [ "$MDN" == "" ]; then
@@ -39,8 +39,9 @@ fi
 IMSI=$(echo "$LO" | cut -d "=" -f 3)
 
 
-INFO=$(cat $DB | grep $IMSI | cut -d '|' -f 2)
+INFO=$(cat $DB | grep $IMSI | tail -n 1 | cut -d '|' -f 2)
 
+#echo №№№№№№ $INFO
 
 if [ "$INFO" == "" ]; then
     echo "unknown IMSI: $IMSI"
