@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -331,6 +332,11 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             return true;
         }
 
+        // Some auto math
+        if (processAutoCalc(msg)) {
+            return true;
+        }
+
         // Something else
         Optional<Info2Record> rep = info2.firstMatch(text);
         if (rep.isPresent()) {
@@ -381,6 +387,28 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             log.info("No MEMBERS file");
             ex.printStackTrace();
         }
+    }
+
+    private static boolean looksLikeMathOrNot(String src) {
+        final String valid = "0123456789.-+*^/() ";
+        for (int i = 0; i < src.length(); i++) {
+            if (valid.indexOf(src.charAt(i)) < 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean processAutoCalc(IncomingMessage msg) {
+        try {
+            if (looksLikeMathOrNot(msg.getText())) {
+                answerScriptEx(msg, "calc", msg.getText());
+                return true;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
     }
 
     private boolean processCommand(IncomingMessage msg) {
@@ -773,7 +801,17 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         //boolean csRes = bot.chanserv(-1001082390874L, new Nickname(1, "zloy", true), "!en  свинья");
 
         // 2020
-        boolean csRes = bot.chanserv(-1001082390874L, new Nickname(1, "zloy", true), "calc 209.4+2");
+        //boolean csRes = bot.chanserv(-1001082390874L, new Nickname(1, "zloy", true), "calc 209.4+2");
+        // Auto calc
+        /*
+        boolean bx = looksLikeMathOrNot("123");
+        bx =looksLikeMathOrNot("1+2");
+        bx =looksLikeMathOrNot("0.5+ 3*4");
+        bx =looksLikeMathOrNot("но это уже так... я это решаю через магнитный браслет\n" +
+                "<Hermit_W> вот такой https://tula.vseinstrumenti.ru/spetsodezhda/sumki-kejsy/r");
+        bx =looksLikeMathOrNot("нет");
+        */
+        boolean csRes = bot.chanserv(-1001082390874L, new Nickname(1, "zloy", true), "2+2");
 
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "123");
 
