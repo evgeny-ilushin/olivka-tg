@@ -50,6 +50,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
     private static final String DONNO_RDB = "donno";
 
     private static final String MEMBERS_CACHE = "members.json";
+    private static final int MIN_AUTOMATH_LENGTH = 3;
 
     // Answered messages
     Cache<String, String> msgCache = null;
@@ -390,6 +391,9 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
     }
 
     private static boolean looksLikeMathOrNot(String src) {
+        if (src == null || src.length() < MIN_AUTOMATH_LENGTH) {
+            return false;
+        }
         final String valid = "0123456789.-+*^/() ";
         for (int i = 0; i < src.length(); i++) {
             if (valid.indexOf(src.charAt(i)) < 0) {
