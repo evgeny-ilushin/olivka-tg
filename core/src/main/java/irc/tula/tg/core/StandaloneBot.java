@@ -62,7 +62,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
     // Members
     @Getter
-    private HashMap<Integer, Nickname> members = new HashMap<>();
+    //private HashMap<Integer, Nickname> members = new HashMap<>();
+    ChatMembersCache members = new ChatMembersCache();
 
     // Info2
     @Getter
@@ -235,7 +236,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             String nickName = from.username();
             Nickname nick;
 
-            nick = members.get(from.id());
+            nick = members.get(m.chat().id(), from.id());
 
             if (nick == null) {
                 // Bullshit
@@ -291,18 +292,18 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         // Last seen
         nickName.notice();
 
-        Nickname nCache = members.get(from_id);
+        Nickname nCache = members.get(chatId, from_id);
 
         if (nCache != null) {
             // Already seen
             if (!(""+nCache).equals(""+nickName)) {
                 // Renamed
-                members.put(from_id, nickName);
+                members.put(chatId, from_id, nickName);
                 sayOnChannel(chatId, "теперь я знаю " + nCache + " как " + nickName + " \uD83D\uDE0E");
                 saveState();
             }
         } else {
-            members.put(from_id, nickName);
+            members.put(chatId, from_id, nickName);
             sayOnChannel(chatId, "теперь я знаю " + nickName + " \uD83D\uDE0E");
             saveState();
         }
@@ -361,7 +362,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
     private void saveState() {
         try {
             new File(MEMBERS_CACHE).delete();
-            mapper.write(MEMBERS_CACHE, members.values());
+            mapper.write(MEMBERS_CACHE, members);
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -369,7 +370,11 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
     private void loadState() {
         try {
-            Object[] m  =  mapper.read(MEMBERS_CACHE, Nickname[].class);
+            ChatMembersCache m  =  mapper.read(MEMBERS_CACHE, ChatMembersCache.class);
+            if (m != null) {
+                members = m;
+            }
+            /*
             if (m != null && m.length > 0) {
                 log.info("Loaded MEMBERS cache: {}, {} nickname(s)", MEMBERS_CACHE, m.length);
                 for (Object o: m) {
@@ -383,6 +388,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                 }
                 //members = m;
             }
+            */
         }
         catch (Exception ex) {
             log.info("No MEMBERS file");
@@ -454,10 +460,10 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             if (msg.isAdminMessage() /* && msg.isPersonal() */ ) {
                 if ("forget".equalsIgnoreCase(cmd) || "нахер".equalsIgnoreCase(cmd)) {
                     if ("all".equalsIgnoreCase(params) || "всех".equalsIgnoreCase(params)) {
-                        HashMap<Integer, Nickname> admins = new HashMap<Integer, Nickname>();
-                        for (Nickname e : members.values()) {
+                        ChatMembersCache admins = new ChatMembersCache();
+                        for (Nickname e : members.list(msg.getChatId())) {
                             if (getConfig().isAdmin(e.toString())) {
-                                admins.put(e.getId(), e);
+                                admins.put(msg.getChatId(), e.getId(), e);
                             }
                         }
                         members = admins;
@@ -465,9 +471,9 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                         saveState();
                     }
                     else {
-                        for (Nickname e : members.values()) {
+                        for (Nickname e : members.list(msg.getChatId())) {
                             if (e.toString().equals(params) || e.toString().equals(NewWorld.NICK_PREFIX + params)) {
-                                members.remove(e.getId());
+                                members.remove(msg.getChatId(), e.getId());
                                 sayOk[0] = true;
                                 saveState();
                                 break;
@@ -696,7 +702,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
     }
 
     private String caveReplace(Long chatId, String text, Nickname nickName) {
-        String res = text.replaceAll("N~", nickName.toString()).replaceAll("R~", randomNick().toString()).replaceAll(Cave.LINE_SEPARATOR, NewWorld.LINE_SEPARATOR);
+        String res = text.replaceAll("N~", nickName.toString()).replaceAll("R~", randomNick(chatId).toString()).replaceAll(Cave.LINE_SEPARATOR, NewWorld.LINE_SEPARATOR);
         if (res.startsWith("+")) {
             res = "/me " + res.substring(1);
         }
@@ -750,9 +756,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         return null;
     }
 
-    public Nickname randomNick() {
-        int rPos = RDBResource.RNG.nextInt(members.size());
-        return (Nickname)(members.values().toArray()[rPos]);
+    public Nickname randomNick(Long chatId) {
+        return members.randomAt(chatId);
     }
 
     private static String toJson(Update u) {
@@ -838,7 +843,12 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                 "<Hermit_W> вот такой https://tula.vseinstrumenti.ru/spetsodezhda/sumki-kejsy/r");
         bx =looksLikeMathOrNot("нет");
         */
-        boolean csRes = bot.chanserv(-1001082390874L, new Nickname(1, "zloy", true), "2+2");
+        boolean csRes = bot.chanserv(-1001082390874L, new Nickname(10, "zloy", true), "2+2");
+
+        csRes = bot.chanserv(-1001082390874L, new Nickname(10, "zloy", true), "2+2");
+        csRes = bot.chanserv(-100108239087L, new Nickname(11, "zloy1", true), "2+2 43 324");
+        csRes = bot.chanserv(-100108239087L, new Nickname(12, "zloy2", true), "маро");
+        csRes = bot.chanserv(-100108239087L, new Nickname(13, "zloy3", true), "мас");
 
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "123");
 
@@ -860,13 +870,11 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
 
         // fake members
-        /*
-        bot.members.add(new Nickname("User1", true));
-        bot.members.add(new Nickname("User2", true));
-        bot.members.add(new Nickname("User3", false));
-        */
+        bot.members.put(1L, 1, new Nickname(1, "User1", true));
+        bot.members.put(1L, 2, new Nickname(2, "User2", true));
+        bot.members.put(1L, 3, new Nickname(3, "User3", false));
 
-        //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "fа кто в жопе");
+        bot.chanserv(-100108239087L, new Nickname(44, "zloy", true), "а кто в жопе");
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "а кто анус");
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "скажи частушку");
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "гнилой, скажи частушку");

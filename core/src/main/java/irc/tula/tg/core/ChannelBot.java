@@ -16,10 +16,10 @@ public interface ChannelBot {
     void answerText(IncomingMessage msg, String reply);
     void answerDonno(IncomingMessage msg);
     void answerRdb(IncomingMessage msg, String rdb);
-    Nickname randomNick();
+    Nickname randomNick(Long chatId);
     RDBResource getRdbByName(String name);
     TextLog getCallbacks();
-    HashMap<Integer, Nickname> getMembers();
+    //HashMap<Integer, Nickname> getMembers();
     Info2Resource getInfo2();
     MyObjectMapper getMapper();
     BotConfig getConfig();
