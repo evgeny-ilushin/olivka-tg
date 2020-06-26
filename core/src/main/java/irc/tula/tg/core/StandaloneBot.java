@@ -391,16 +391,34 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
     }
 
     private static boolean looksLikeMathOrNot(String src) {
-        if (src == null || src.length() < MIN_AUTOMATH_LENGTH) {
+        // long enough
+        if (src == null || src.trim().length() < MIN_AUTOMATH_LENGTH) {
             return false;
         }
-        final String valid = "0123456789.-+*^/() ";
+
+        src = src.trim();
+
+        // contains proper chars
+        final String valid = "0123456789.-+*^/%() ";
         for (int i = 0; i < src.length(); i++) {
             if (valid.indexOf(src.charAt(i)) < 0) {
                 return false;
             }
         }
-        return true;
+        // at least 2 digits + 1 operator
+        int numd = 0, numo = 0;
+        final String validOps = "-+*^/%()";
+        final String validDgs = "0123456789";
+        for (int i = 0; i < src.length(); i++) {
+            if (validOps.indexOf(src.charAt(i)) > -1) {
+                numo++;
+            }
+            else if (validDgs.indexOf(src.charAt(i)) > -1) {
+                numd++;
+            }
+        }
+
+        return numo >= 1 && numd >= 2;
     }
 
     private boolean processAutoCalc(IncomingMessage msg) {
@@ -790,6 +808,11 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
     }
 
     private static void my_tests(StandaloneBot bot) {
+
+        boolean f = looksLikeMathOrNot("2+2");
+        f =looksLikeMathOrNot("0.5+ 3*4");
+
+
         log.info("*** DEBUG MODE ***");
         long CHAT = -1001082390874L;
 
