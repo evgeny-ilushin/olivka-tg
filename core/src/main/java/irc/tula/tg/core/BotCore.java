@@ -11,6 +11,7 @@ import com.pengrad.telegrambot.response.SendResponse;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.util.Optional;
@@ -26,8 +27,18 @@ public class BotCore {
     protected final BotConfig config;
 
     public BotCore(BotConfig config) {
-        this.config = config;
+        this.config = checkConfig(config);
         tg = new TelegramBot(config.getToken());
+    }
+
+    private BotConfig checkConfig(BotConfig config) {
+        if (config != null) {
+            if (StringUtils.isBlank(config.getEncoding())) {
+                config.setEncoding(Cave.getEncoding());
+            }
+            log.info("Bot config: {}", config.asTable());
+        }
+        return config;
     }
 
     protected void start(UpdatesListener cb) {

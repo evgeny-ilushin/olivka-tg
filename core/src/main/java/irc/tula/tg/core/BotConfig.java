@@ -20,6 +20,8 @@ public class BotConfig {
 
     private String token;
 
+    private String encoding;
+
     private List<String> admins;
     private List<String> names;
 
@@ -52,6 +54,18 @@ public class BotConfig {
 
     @Transient
     public static BotConfig getSample() {
-        return new BotConfig("/home/mybot", "123123123:454564", Arrays.asList("@murzambek", "@zloy"), Arrays.asList("bot", "MyBot", "@my_bot_nick"), true, false);
+        return new BotConfig("/home/mybot", "123123123:454564", Cave.getEncoding(), Arrays.asList("@murzambek", "@zloy"), Arrays.asList("bot", "MyBot", "@my_bot_nick"), true, false);
+    }
+
+    public String asTable() {
+        return "{ " +
+                "baseDir='" + baseDir + '\'' +
+                ", token='" + token + '\'' +
+                ", encoding='" + encoding + '\'' +
+                ", admins=" + admins +
+                ", names=" + names +
+                ", debug=" + debug +
+                ", runTests=" + runTests +
+                " }";
     }
 }

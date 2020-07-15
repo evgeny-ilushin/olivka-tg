@@ -67,7 +67,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
     // Info2
     @Getter
-    Info2Resource info2 = new Info2Resource(getConfig().getDataDirName(), INFO2);
+    Info2Resource info2 = new Info2Resource(getConfig().getDataDirName(), INFO2, config.getEncoding());
 
     // RDBs
     @Getter
@@ -111,7 +111,6 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             Optional<BotConfig> c = JsonObjectMapper.readConfig(cfgPath);
             if (c.isPresent()) {
                 StandaloneBot bot = new StandaloneBot(c.get());
-                log.info("Starting bot using {} ...", cfgPath);
                 log.info("Starting bot using {} ...", cfgPath);
 
                 if (bot.getConfig().isRunTests()) {
@@ -746,7 +745,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         if (res != null)
             return res;
 
-        RDBResource newRes = new RDBResource(getConfig().getDataDir(name + Cave.RDB_FILE_EXTENSION));
+        RDBResource newRes = new RDBResource(getConfig().getDataDir(name + Cave.RDB_FILE_EXTENSION), config.getEncoding());
 
         if (newRes.isAvailabe()) {
             log.info("Adding RDB to cache: {}", name);

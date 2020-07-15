@@ -8,7 +8,7 @@ import lombok.Setter;
 public abstract class Cave {
     @Getter
     @Setter(AccessLevel.PROTECTED)
-    private static String  locale = "windows-1251";
+    private static String encoding = "windows-1251";
 
     public static final String LINE_SEPARATOR = "\\|";
     public static final String PATH_SEPARATOR = "/";

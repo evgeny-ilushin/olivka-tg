@@ -32,15 +32,19 @@ public class RDBResource {
     @Getter @Setter(AccessLevel.PROTECTED)
     private final List<String> data = new ArrayList<String>();
 
+    @Getter
+    private final String encoding;
+
     public int size() { return data.size(); }
 
-    public RDBResource(String fullPath) {
+    public RDBResource(String fullPath, String encoding) {
         this.fullPath = fullPath;
+        this.encoding = encoding;
         reload();
     }
 
     private void reload() {
-        try (Stream<String> stream = Files.lines(Paths.get(fullPath), Charset.forName(Cave.getLocale()))) {
+        try (Stream<String> stream = Files.lines(Paths.get(fullPath), Charset.forName(encoding))) {
             stream.forEach(line -> {
                 if (StringUtils.isNotBlank(line)) {
                     data.add(line.trim());

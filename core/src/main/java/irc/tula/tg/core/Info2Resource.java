@@ -30,11 +30,15 @@ public class Info2Resource {
     @Getter @Setter(AccessLevel.PROTECTED)
     private final List<Info2Record> data = new ArrayList<Info2Record>();
 
+    @Getter
+    private String encoding;
+
     public int size() { return data.size(); }
 
-    public Info2Resource(String directoryPath, String fileName) {
+    public Info2Resource(String directoryPath, String fileName, String encoding) {
         this.directoryPath = directoryPath;
         this.fileName = fileName;
+        this.encoding = encoding;
         reload();
     }
 
@@ -50,7 +54,7 @@ public class Info2Resource {
 
     private void reload() {
         String fullPath = directoryPath + NewWorld.PATH_SEPARATOR + fileName;
-        try (Stream<String> stream = Files.lines(Paths.get(fullPath), Charset.forName(Cave.getLocale()))) {
+        try (Stream<String> stream = Files.lines(Paths.get(fullPath), Charset.forName(encoding))) {
             stream.forEach(line -> {
                 if (StringUtils.isNotBlank(line)) {
                     Optional<Info2Record> item = Info2Record.fromSource(line);
