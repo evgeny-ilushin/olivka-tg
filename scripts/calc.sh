@@ -11,7 +11,7 @@ function FixZeros {
     #echo "FixZeros: $I"
     local I="$@"
     if ! [[ "$I" =~ [^a-zA-Z\ ] ]]; then
-	echo "$I"
+	echo "$I" | tr '[:upper:]' '[:lower:]'
     else
 	echo "$I" | awk '{printf "%08f\n", $0}' | sed '/\./ s/\.\{0,1\}0\{1,\}$//'
     fi
