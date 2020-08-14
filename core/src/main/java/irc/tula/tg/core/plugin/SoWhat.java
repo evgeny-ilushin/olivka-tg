@@ -123,23 +123,28 @@ public class SoWhat implements Plugin {
             }
 
             int ndx = 1;
+            StringBuilder dateList = new StringBuilder();
             for (DateItem i : today) {
                 if (personal) {
                     Date ts = new Date(1000L * i.getTs());
                     String l = "" + (ndx++) + ". <i>" + i.getText() + "</i> (" + i.getNick() + ", " + format.format(ts) + ")";
-                    bot.sayOnChannel(msg.getChatId(), l);
+                    dateList.append(l+"\n");
+                    //bot.sayOnChannel(msg.getChatId(), l);
                 } else {
                     String l = "" + (ndx++) + ". <i>" + i.getText() + "</i>";
-                    bot.sayOnChannel(msg.getChatId(), l);
+                    //bot.sayOnChannel(msg.getChatId(), l);
+                    dateList.append(l+"\n");
                 }
                 if (ndx > maxNdx) {
                     if (today.size() > maxNdx) {
                         String tail = "...<b>" + (today.size() - maxNdx) + "</b> more";
-                        bot.sayOnChannel(msg.getChatId(), tail);
+                        //bot.sayOnChannel(msg.getChatId(), tail);
+                        dateList.append(tail+"\n");
                     }
                     break;
                 }
             }
+            bot.sayOnChannel(msg.getChatId(), dateList.toString());
         }
 
         return false;

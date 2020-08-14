@@ -820,12 +820,19 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         log.info("*** DEBUG MODE ***");
         long CHAT = -1001082390874L;
 
-        Update u = new Update();
+        //bot.chanserv(-100108239087L, new Nickname(44, "zloy", true), "ну что?");
+        bot.chanserv(-100108239087L, new Nickname(44, "zloy", true), "ну так что?");
 
-        bot.loadCore();
-        boolean r = bot.wasAnsweredRecently(u);
-        bot.addToAnsweredCache(u);
-        r = bot.wasAnsweredRecently(u);
+        if (1+3 > 2) {
+            return;
+        }
+
+        //Update u = new Update();
+
+        //bot.loadCore();
+        //boolean r = bot.wasAnsweredRecently(u);
+        //bot.addToAnsweredCache(u);
+        //r = bot.wasAnsweredRecently(u);
 
         //boolean csRes = bot.chanserv(-1001082390874L, new Nickname(1, "zloy", true), "444");
         //boolean csRes = bot.chanserv(-1001082390874L, new Nickname(1, "zloy", true), "!ru  cow");
