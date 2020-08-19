@@ -192,4 +192,13 @@ public class SoWhat implements Plugin {
 
         return res;
     }
+
+    public void dumpSortedCSV() {
+        int c = 1;
+        System.out.println("N, SortStr, Year, Month, Day, Nick, Added, Text");
+        for (DateItem i : database.getItems()) {
+            String l = String.format("%d, %s, %04d, %02d, %02d, %s, %s, %s", c++, i.getSid(), i.getYear(), i.getMonth(), i.getDay(), i.getNick(), i.getTs(), i.getText());
+            System.out.println(l);
+        }
+    }
 }
