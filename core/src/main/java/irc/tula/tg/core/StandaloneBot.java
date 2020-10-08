@@ -11,10 +11,7 @@ import irc.tula.tg.core.data.JsonObjectMapper;
 import irc.tula.tg.core.data.MyObjectMapper;
 import irc.tula.tg.core.entity.IncomingMessage;
 import irc.tula.tg.core.entity.Nickname;
-import irc.tula.tg.core.plugin.Plugin;
-import irc.tula.tg.core.plugin.SoWhat;
-import irc.tula.tg.core.plugin.WebCap;
-import irc.tula.tg.core.plugin.YWeather;
+import irc.tula.tg.core.plugin.*;
 import irc.tula.tg.util.ExecCommand;
 import irc.tula.tg.util.TextLog;
 import lombok.Getter;
@@ -23,13 +20,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 @Slf4j
 public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBot {
@@ -51,6 +46,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
     private static final String MEMBERS_CACHE = "members.json";
     private static final int MIN_AUTOMATH_LENGTH = 3;
+
+    private static final boolean QIFY_UNKNOWN = true;
 
     // Answered messages
     Cache<String, String> msgCache = null;
@@ -351,11 +348,30 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                     answerInfo2Match(msg, rep.get());
                     answered = true;
                 } else {
-                    answerDonno(msg);
+                    if (QIFY_UNKNOWN) {
+                        answerQified(msg);
+                    } else {
+                        answerDonno(msg);
+                    }
                 }
             }
         }
         return answered;
+    }
+
+    private void answerQified(IncomingMessage msg) {
+        try {
+            String qtext = Qify.text(msg.getText());
+            if (qtext != null && !qtext.equals(msg.getText())) {
+                String reply = msg.getNickName() + NewWorld.NICK_SEPARATOR + qtext;
+                sayOnChannel(msg.getChatId(), reply);
+            } else {
+                answerDonno(msg);
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void saveState() {
@@ -452,7 +468,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
             String cmd = result[0];
             String params = result[1];
-            msg.setText(params.trim());
+            //msg.setText(params.trim());
             msg.setWasTrimmedToParams(true);
 
             // 1
@@ -813,19 +829,18 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
     private static void my_tests(StandaloneBot bot) {
 
-        boolean f = looksLikeMathOrNot("2+2");
-        f =looksLikeMathOrNot("0.5+ 3*4");
+        //boolean f = looksLikeMathOrNot("2+2");
+        //f =looksLikeMathOrNot("0.5+ 3*4");
 
 
         log.info("*** DEBUG MODE ***");
         long CHAT = -1001082390874L;
 
-        //bot.chanserv(-100108239087L, new Nickname(44, "zloy", true), "ну что?");
-        bot.chanserv(-100108239087L, new Nickname(44, "zloy", true), "ну так что?");
+        //SoWhat soWhat = (SoWhat)bot.plugins.get("sowhat");
+        //soWhat.dumpSortedCSV();
 
-        if (1+3 > 2) {
-            return;
-        }
+        //bot.chanserv(-100108239087L, new Nickname(44, "zloy", true), "ну что?");
+        //bot.chanserv(-100108239087L, new Nickname(44, "zloy", true), "ну так что?");
 
         //Update u = new Update();
 
@@ -849,7 +864,11 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                 "<Hermit_W> вот такой https://tula.vseinstrumenti.ru/spetsodezhda/sumki-kejsy/r");
         bx =looksLikeMathOrNot("нет");
         */
-        boolean csRes = bot.chanserv(-1001082390874L, new Nickname(10, "zloy", true), "2+2");
+        boolean csRes = bot.chanserv(-1001082390874L, new Nickname(10, "zloy", true), "гнилой, литосферная плита");
+
+        if (true) {
+            return;
+        }
 
         csRes = bot.chanserv(-1001082390874L, new Nickname(10, "zloy", true), "2+2");
         csRes = bot.chanserv(-100108239087L, new Nickname(11, "zloy1", true), "2+2 43 324");
