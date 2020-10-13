@@ -1,10 +1,13 @@
 package irc.tula.tg.core.plugin;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
 
 import java.util.HashMap;
 
 public class Qify {
+    private static final int MIN_WORD_LENGTH = 3;
+
     public static String text(String text) {
         try {
             StringBuilder res = new StringBuilder();
@@ -39,7 +42,14 @@ public class Qify {
 
     public static String word(String word) {
         String source = word;
-        word = word.toLowerCase().trim();
+
+        if (word == null || word.length() < MIN_WORD_LENGTH) {
+            return word;
+        }
+
+        word = word.trim();
+        String lcWord = word.toLowerCase().trim();
+        Boolean isUcWord = StringUtils.isAllUpperCase(""+word.charAt(0));
 
         String vowels = "аеёиоуыэюя";
         HashMap<Character, Character> rules = new HashMap<Character, Character>();
@@ -50,20 +60,42 @@ public class Qify {
         rules.put('э', 'е');
 
         for (char letter : word.toCharArray()) {
-            if (vowels.indexOf(letter) != -1) {
-                if (rules.containsKey(letter)) {
-                    word = rules.get(letter) + word.substring(1);
+            boolean isUc = Character.isUpperCase(letter);
+            char lcLetter = Character.toLowerCase(letter);
+            if (vowels.indexOf(lcLetter) != -1) {
+                if (rules.containsKey(lcLetter)) {
+                    word = (isUc? Character.toUpperCase(rules.get(lcLetter)) : rules.get(lcLetter)) + word.substring(1);
                 }
                 break;
             } else {
                 word = word.substring(1);
             }
         }
-        return word.isEmpty() ? source : "ху" + word;
+        return word.isEmpty() ? source : ((isUcWord?"Х":"х") + "у" + word);
+    }
+
+    @Test
+    public static void test1() {
+        System.out.println(text("Привет, ты и дела, и еще Тектоническая плита"));
     }
 
     public static void main(String[] args) {
-        String s1 = text("литосферная плита!");
-        System.out.println(s1);
+        /*
+        test1();
+        if (1 == 1) {
+            return;
+        }
+        */
+        String text = String.join(" ", args);
+        if (StringUtils.isNotBlank(text)) {
+            String qtext = text(text);
+            if (!text.equals(qtext)) {
+                System.out.println(qtext);
+            } else {
+                System.err.println("unprocessable");
+            }
+        } else {
+            System.err.println("Usage: Qify <TEXT>");
+        }
     }
 }
