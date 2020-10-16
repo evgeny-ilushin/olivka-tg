@@ -363,7 +363,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         try {
             String qtext = Qify.text(msg.getText());
             if (qtext != null && !qtext.equals(msg.getText())) {
-                String reply = msg.getNickName() + NewWorld.NICK_SEPARATOR + qtext;
+                String reply = msg.getNickName() + NewWorld.NICK_SEPARATOR + qtext.trim();
                 sayOnChannel(msg.getChatId(), reply);
             } else {
                 answerDonno(msg);
@@ -864,7 +864,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                 "<Hermit_W> вот такой https://tula.vseinstrumenti.ru/spetsodezhda/sumki-kejsy/r");
         bx =looksLikeMathOrNot("нет");
         */
-        boolean csRes = bot.chanserv(-1001082390874L, new Nickname(10, "zloy", true), "гнилой, литосферная плита");
+        boolean csRes = bot.chanserv(-1001082390874L, new Nickname(10, "zloy", true), "гнилой,  тинькофф");
 
         if (true) {
             return;
