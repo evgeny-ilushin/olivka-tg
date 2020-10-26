@@ -19,6 +19,7 @@ import java.util.Optional;
 @Slf4j
 public class BotCore {
     private static final int LONG_SENTENSE = 20;
+    private static final String STICKER_PREFIX = "sticker:";
 
     @Getter
     protected final TelegramBot tg;
@@ -100,31 +101,66 @@ public class BotCore {
     }
 
     public Optional<Message> sayOnChannel(Long chatId, String text) {
+        // Typing notification
+        if (text != null && text.length() > LONG_SENTENSE) {
+            typeOnChannel(chatId);
+        }
+
+        try {
+            // Detect sticker
+            if (text.startsWith(STICKER_PREFIX)) {
+                String stickerId = text.substring(STICKER_PREFIX.length());
+                Optional<Message> res = sendSticker(chatId, stickerId);
+                if (res.isPresent() && res.get().messageId() != null) {
+                    return Optional.of(res.get());
+                }
+            }
+
+            if (config.isDebug()) {
+                log.info("FAKE SEND: {} {}", chatId, text);
+                return Optional.empty();
+            }
+
+            SendMessage request = new SendMessage(chatId, text)
+                    .parseMode(ParseMode.HTML)
+                    .disableWebPagePreview(true)
+                    .disableNotification(true)
+                    //.replyToMessageId(1)
+                    //.replyMarkup(new ForceReply())
+                    ;
+
+            SendResponse sendResponse = tg.execute(request);
+            boolean ok = sendResponse.isOk();
+            log.info("TG.send: {}, {} - {}", sendResponse, sendResponse.message(), ok ? "OK" : "FAILED");
+            return Optional.of(sendResponse.message());
+
+        } catch (Exception ex) {
+            log.error("sayOnChannel: {}", ex);
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Message> sendSticker(Long chatId, String text) {
         if (config.isDebug()) {
-            log.info("FAKE SEND: {} {}", chatId, text);
+            log.info("FAKE SEND_STICKER: {} {}", chatId, text);
             return Optional.empty();
         } else {
 
+            /*
             // Typing notification
             if (text != null && text.length() > LONG_SENTENSE) {
                 typeOnChannel(chatId);
             }
+            */
 
             try {
-                SendMessage request = new SendMessage(chatId, text)
-                        .parseMode(ParseMode.HTML)
-                        .disableWebPagePreview(true)
-                        .disableNotification(true)
-                        //.replyToMessageId(1)
-                        //.replyMarkup(new ForceReply())
-                        ;
-
+                SendSticker request = new SendSticker(chatId, text);
                 SendResponse sendResponse = tg.execute(request);
                 boolean ok = sendResponse.isOk();
-                log.info("TG.send: {}, {}", sendResponse, sendResponse.message());
+                log.info("TG.sendSticker: {}, {} - {}", sendResponse, sendResponse.message(), ok? "OK" : "FAILED");
                 return Optional.of(sendResponse.message());
             } catch (Exception ex) {
-                log.error("sayOnChannel: {}", ex);
+                log.error("sendSticker: {}", ex);
                 return Optional.empty();
             }
         }

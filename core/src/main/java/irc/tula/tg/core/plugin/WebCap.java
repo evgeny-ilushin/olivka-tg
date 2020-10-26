@@ -42,7 +42,7 @@ public class WebCap implements Plugin {
 
     @Override
     public boolean process(ChannelBot bot, IncomingMessage msg, String pluginName, String[] params) {
-        bot.typeOnChannel(msg.getChatId());
+        //bot.typeOnChannel(msg.getChatId());
         String img = callWcScript(bot, msg, "webcap", params);
         if (img != null) {
             log.info("Script response: {}", img);

@@ -13,6 +13,7 @@ public interface ChannelBot {
     Optional<Message> sayOnChannel(Long chatId, String text);
     void typeOnChannel(Long chatId);
     void sendImageToChat(Long chatId, String pathToFile);
+    Optional<Message> sendSticker(Long chatId, String text);
     void answerText(IncomingMessage msg, String reply);
     void answerDonno(IncomingMessage msg);
     void answerRdb(IncomingMessage msg, String rdb);

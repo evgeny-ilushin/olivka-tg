@@ -134,6 +134,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         addPlugin(new SoWhat());
         addPlugin(new YWeather());
         addPlugin(new WebCap());
+        addPlugin(new Sticker());
         plugins.forEach((k,v) -> v.initialize(this));
     }
 
@@ -814,6 +815,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                         }
 
                     }
+                    else {
+                    }
                 }
 
             }
@@ -864,7 +867,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                 "<Hermit_W> вот такой https://tula.vseinstrumenti.ru/spetsodezhda/sumki-kejsy/r");
         bx =looksLikeMathOrNot("нет");
         */
-        boolean csRes = bot.chanserv(-1001082390874L, new Nickname(10, "zloy", true), "гнилой,  тинькофф");
+        boolean csRes = bot.chanserv(-1001082390874L, new Nickname(10, "zloy", true), "гнилой, кохуита ");
 
         if (true) {
             return;
