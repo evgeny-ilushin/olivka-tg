@@ -9,6 +9,13 @@ import java.util.Random;
 public class Qify {
     private static final int MIN_WORD_LENGTH = 3;
 
+    private static final int MIN_SHORT_WORD_LENGTH = 2;
+    private static final int MAX_SHORT_WORD_LENGTH = 3;
+
+    private static final String SHORT_WORD_PRE_1 = "хуе";
+
+    private static final int MIN_WORD_LENGTH_1V = 5;
+
     private static final String vowels = "аеёиоуыэюя";
     private static final HashMap<Character, Character> rules = new HashMap<Character, Character>();
     static {
@@ -104,7 +111,19 @@ public class Qify {
     public static String word(String word, boolean skipSome) {
         String source = word;
 
+        // short
+        if (word != null && word.length() >= MIN_SHORT_WORD_LENGTH && word.length() <= MAX_SHORT_WORD_LENGTH) {
+            if (!vowels.contains(word.substring(0, 1))) {
+                return SHORT_WORD_PRE_1 + word;
+            }
+        }
+
         if (word == null || word.length() < MIN_WORD_LENGTH) {
+            return word;
+        }
+
+        int numVwls = countVowels(word);
+        if (numVwls < 2 && word.length() < MIN_WORD_LENGTH_1V) {
             return word;
         }
 
@@ -146,6 +165,8 @@ public class Qify {
         System.out.println(text("Тектоническая", true));
         System.out.println(text("Тектоническая", false));
         */
+        System.out.println(text("яма, кот, ты, кит, тля, еще, кто, зря"));
+        if (true) return;
 
         System.out.println(text("в ходе прокурорских проверок возбуждено 10 уголовных дел о коррупции"));
         System.out.println(text("я хотел купить и спрашивал: а разговаривать по ней можно"));
