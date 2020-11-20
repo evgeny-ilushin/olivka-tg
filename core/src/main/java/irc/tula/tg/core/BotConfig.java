@@ -24,12 +24,16 @@ public class BotConfig {
 
     private List<String> admins;
     private List<String> names;
+    private List<String> ignore;
 
     private boolean debug;
     private boolean runTests = false;
 
     public boolean isAdmin(String nick) {
         return (admins != null && admins.size() > 0 && admins.contains(nick));
+    }
+    public boolean isIgnored(String nick) {
+        return (ignore != null && ignore.size() > 0 && ignore.contains(nick));
     }
 
     @Transient
@@ -54,18 +58,19 @@ public class BotConfig {
 
     @Transient
     public static BotConfig getSample() {
-        return new BotConfig("/home/mybot", "123123123:454564", Cave.getEncoding(), Arrays.asList("@murzambek", "@zloy"), Arrays.asList("bot", "MyBot", "@my_bot_nick"), true, false);
+        return new BotConfig("/home/mybot", "123123123:454564", Cave.getEncoding(), Arrays.asList("@murzambek", "@zloy"), Arrays.asList("bot", "MyBot", "@my_bot_nick"), Arrays.asList("123"), true, false);
     }
 
     public String asTable() {
-        return "{ " +
+        return "{" +
                 "baseDir='" + baseDir + '\'' +
                 ", token='" + token + '\'' +
                 ", encoding='" + encoding + '\'' +
                 ", admins=" + admins +
                 ", names=" + names +
+                ", ignore=" + ignore +
                 ", debug=" + debug +
                 ", runTests=" + runTests +
-                " }";
+                '}';
     }
 }

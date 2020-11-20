@@ -286,6 +286,12 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         String replyNickName = nickName.toString();
         Integer from_id = nickName.getId();
 
+        boolean ignoreMessage = getConfig().isIgnored(nickName.toString());
+        if (ignoreMessage) {
+            log.info("*ignoring message from [" + nickName.toString() + "]*");
+            return true;
+        }
+
         // Last seen
         nickName.notice();
 
@@ -867,7 +873,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                 "<Hermit_W> вот такой https://tula.vseinstrumenti.ru/spetsodezhda/sumki-kejsy/r");
         bx =looksLikeMathOrNot("нет");
         */
-        boolean csRes = bot.chanserv(-1001082390874L, new Nickname(10, "zloy", true), "гнилой, кохуита ");
+        boolean csRes = bot.chanserv(-1001082390874L, new Nickname(10, "123", true), "гнилой, кохуита ");
 
         if (true) {
             return;
