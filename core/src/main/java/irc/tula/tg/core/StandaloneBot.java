@@ -17,6 +17,7 @@ import irc.tula.tg.util.TextLog;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -135,6 +136,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         addPlugin(new YWeather());
         addPlugin(new WebCap());
         addPlugin(new Sticker());
+        addPlugin(new Kovtok());
         plugins.forEach((k,v) -> v.initialize(this));
     }
 
@@ -873,7 +875,9 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                 "<Hermit_W> вот такой https://tula.vseinstrumenti.ru/spetsodezhda/sumki-kejsy/r");
         bx =looksLikeMathOrNot("нет");
         */
-        boolean csRes = bot.chanserv(-1001082390874L, new Nickname(10, "123", true), "гнилой, кохуита ");
+        //boolean csRes = bot.chanserv(-1001082390874L, new Nickname(10, "123", true), "гнилой, кохуита ");
+
+        boolean csRes = bot.chanserv(-1001082390874L, new Nickname(10, "zloy", true), "глоток");
 
         if (true) {
             return;
