@@ -19,8 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -28,7 +30,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBot {
+public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBot, LambdaBot {
 
     // olivka
     //private static final String DEFAULT_TOKEN = "294103149:AAGPawepBdjAtu9z9aKDj2rLwwdNt0UDi9E";
@@ -96,7 +98,6 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                 BotConfig c = BotConfig.getSample();
                 String sampleConfig = JsonObjectMapper.dumpConfig(c);
                 System.out.println("Sample config:\n\t" + sampleConfig);
-
                 return;
             }
 
@@ -112,7 +113,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                 log.info("Starting bot using {} ...", cfgPath);
 
                 if (bot.getConfig().isRunTests()) {
-                    my_tests(bot);
+                    consoleSession(bot);
+                    //my_tests(bot);
                 }
                 else {
                     bot.start(bot);
@@ -121,6 +123,24 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         } catch (Exception ex) {
             log.error("Bot crashed (config: {}): {}", args[0], ex);
             ex.printStackTrace();
+        }
+    }
+
+    private static void consoleSession(StandaloneBot bot) throws Exception {
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        String text;
+
+        if (bot == null) {
+            BotConfig cfg = BotConfig.getSample();
+            cfg.setDebug(true);
+            bot = new StandaloneBot(cfg);
+        }
+
+        while (true) {
+            System.out.print("talkToMe> ");
+            text = reader.readLine();
+            System.out.println("" + bot.chanserv(text));
         }
     }
 
@@ -453,8 +473,14 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
     private boolean processAutoCalc(IncomingMessage msg) {
         try {
-            if (looksLikeMathOrNot(msg.getText())) {
-                answerScriptEx(msg, "calc", msg.getText());
+            String mt = msg.getText();
+            if (mt.toLowerCase().startsWith("calc ")) {
+                mt = mt.substring(5).trim();
+                answerScriptEx(msg, "calc", mt);
+                return true;
+            }
+            if (looksLikeMathOrNot(mt)) {
+                answerScriptEx(msg, "calc", mt);
                 return true;
             }
         } catch (Exception ex) {
@@ -922,5 +948,13 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         String pl_dev = "{ \"update_id\":\"18322330\", \"message\":\"null\", \"edited_message\":\"null\", \"channel_post\":\"Message{message_id=6, from=null, date=1565769547, chat=Chat{id=-1001343308314, type=channel, first_name='null', last_name='null', username='olivka_dev', title='olivka development', all_members_are_administrators=null, photo=null, description='null', invite_link='null', pinned_message=null, sticker_set_name='null', can_set_sticker_set=null}, forward_from=null, forward_from_chat=null, forward_from_message_id=null, forward_signature='null', forward_date=null, reply_to_message=null, edit_date=null, media_group_id='null', author_signature='null', text='1', entities=null, caption_entities=null, audio=null, document=null, animation=null, game=null, photo=null, sticker=null, video=null, voice=null, video_note=null, caption='null', contact=null, location=null, venue=null, new_chat_member=null, new_chat_members=null, left_chat_member=null, new_chat_title='null', new_chat_photo=null, delete_chat_photo=null, group_chat_created=null, supergroup_chat_created=null, channel_chat_created=null, migrate_to_chat_id=null, migrate_from_chat_id=null, pinned_message=null, invoice=null, successful_payment=null, connected_website='null', passport_data=null}\", \"edited_channel_post\":\"null\", \"inline_query\":\"null\", \"chosen_inline_result\":\"null\", \"callback_query\":\"null\", \"shipping_query\":\"null\", \"pre_checkout_query\":\"null\" }";
         String pl_prod = "{ \"update_id\":\"18322331\", \"message\":\"Message{message_id=401037, from=User{id=412132074, is_bot=false, first_name='ncuxonycbka', last_name='null', username='ncuxonycbka', language_code='en'}, date=1565769632, chat=Chat{id=-1001082390874, type=supergroup, first_name='null', last_name='null', username='tulairc', title='irc.tula.net', all_members_are_administrators=null, photo=null, description='null', invite_link='null', pinned_message=null, sticker_set_name='null', can_set_sticker_set=null}, forward_from=null, forward_from_chat=null, forward_from_message_id=null, forward_signature='null', forward_date=null, reply_to_message=null, edit_date=null, media_group_id='null', author_signature='null', text='2', entities=null, caption_entities=null, audio=null, document=null, animation=null, game=null, photo=null, sticker=null, video=null, voice=null, video_note=null, caption='null', contact=null, location=null, venue=null, new_chat_member=null, new_chat_members=null, left_chat_member=null, new_chat_title='null', new_chat_photo=null, delete_chat_photo=null, group_chat_created=null, supergroup_chat_created=null, channel_chat_created=null, migrate_to_chat_id=null, migrate_from_chat_id=null, pinned_message=null, invoice=null, successful_payment=null, connected_website='null', passport_data=null}\", \"edited_message\":\"null\", \"channel_post\":\"null\", \"edited_channel_post\":\"null\", \"inline_query\":\"null\", \"chosen_inline_result\":\"null\", \"callback_query\":\"null\", \"shipping_query\":\"null\", \"pre_checkout_query\":\"null\" }";
         String p1_dev1 = "{ \"update_id\":\"18322332\", \"message\":\"null\", \"edited_message\":\"null\", \"channel_post\":\"Message{message_id=7, from=null, date=1565769693, chat=Chat{id=-1001343308314, type=channel, first_name='null', last_name='null', username='olivka_dev', title='olivka development', all_members_are_administrators=null, photo=null, description='null', invite_link='null', pinned_message=null, sticker_set_name='null', can_set_sticker_set=null}, forward_from=null, forward_from_chat=null, forward_from_message_id=null, forward_signature='null', forward_date=null, reply_to_message=null, edit_date=null, media_group_id='null', author_signature='null', text='2', entities=null, caption_entities=null, audio=null, document=null, animation=null, game=null, photo=null, sticker=null, video=null, voice=null, video_note=null, caption='null', contact=null, location=null, venue=null, new_chat_member=null, new_chat_members=null, left_chat_member=null, new_chat_title='null', new_chat_photo=null, delete_chat_photo=null, group_chat_created=null, supergroup_chat_created=null, channel_chat_created=null, migrate_to_chat_id=null, migrate_from_chat_id=null, pinned_message=null, invoice=null, successful_payment=null, connected_website='null', passport_data=null}\", \"edited_channel_post\":\"null\", \"inline_query\":\"null\", \"chosen_inline_result\":\"null\", \"callback_query\":\"null\", \"shipping_query\":\"null\", \"pre_checkout_query\":\"null\" }";
+    }
+
+    @Override
+    public Object chanserv(Object payload) {
+        if (config.isDebug()) {
+            return chanserv(-1L, new Nickname(10, "DEBUG", true), "" + payload);
+        }
+        return null;
     }
 }

@@ -2,10 +2,16 @@
 
 LOG=/tmp/.calc.log
 
+BC=" ~/.bcrc -l"
+
 TEXT="$@"
 RES="OK"
 
 SCALE=2
+
+#    echo "$TEXT" | bc
+#    echo "180/3.1416*asin(1/sqrt(3))" | bc ~/.bcrc -l
+#exit
 
 function FixZeros {
     #echo "FixZeros: $I"
@@ -20,18 +26,25 @@ function FixZeros {
 echo -e "[$TEXT]" >> $LOG
 
 if [[ $TEXT == *"."* ]] || [[ $TEXT == *","* ]]; then
-    RES=$(echo "$TEXT" | bc 2>&1 | head -n 1)
+    RES=$(echo "$TEXT" | bc ~/.bcrc -l 2>&1 | head -n 1)
+#echo 1
+#    echo "$TEXT" | bc ~/.bcrc -l
 else
-    RES=$(echo "scale=$SCALE; $TEXT" | bc 2>&1 | head -n 1)
+    RES=$(echo "scale=$SCALE; $TEXT" | bc ~/.bcrc -l 2>&1 | head -n 1)
+#echo 2
+#    echo "scale=$SCALE; $TEXT" | bc ~/.bcrc -l
 fi
+
 
 #echo -e "################1: $RES"
 
-if [[ $RES == *":"* ]]; then
-    RES=$(echo "$RES" | cut -d':' -f 2 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-else
-    RES=$(echo "scale=$SCALE; $TEXT" | bc 2>&1 | head -n 1)
-fi
+# WTF
+#if [[ $RES == *":"* ]]; then
+#echo "::::::"
+#    RES=$(echo "$RES" | cut -d':' -f 2 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+#else
+#    RES=$(echo "scale=$SCALE; $TEXT" | bc ~/.bcrc -l 2>&1 | head -n 1)
+#fi
 
 #echo -e "################2: $RES"
 
