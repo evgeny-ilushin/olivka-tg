@@ -47,11 +47,11 @@ public class Kovtok implements Plugin {
                     ((hDiff == 1 || hDiff == 21) ? "година" : ((hDiff == 2 || hDiff == 3 || hDiff == 4) ? "години"
                             : "годин")),
                     mDiff,
-                    ((mDiff == 1 || mDiff % 10 == 1) ? "хвилина" : ((mDiff % 10 == 2 || mDiff % 10 == 3 ||
+                    ((mDiff == 1 || (mDiff % 10 == 1 && mDiff > 11)) ? "хвилина" : ((mDiff % 10 == 2 || mDiff % 10 == 3 ||
                             mDiff % 10 == 4) ? "хвилини" : "хвилин")));
         } else {
             ts = String.format("%d %s", mDiff,
-                    ((mDiff == 1 || mDiff % 10 == 1) ? "хвилина" : ((mDiff % 10 == 2 || mDiff % 10 == 3 ||
+                    ((mDiff == 1 || (mDiff % 10 == 1 && mDiff > 11)) ? "хвилина" : ((mDiff % 10 == 2 || mDiff % 10 == 3 ||
                             mDiff % 10 == 4) ? "хвилини" : "хвилин")));
         }
 
@@ -84,11 +84,11 @@ public class Kovtok implements Plugin {
                     ((hDiff == 1 || hDiff == 21) ? "час" : ((hDiff == 2 || hDiff == 3 || hDiff == 4) ? "часа"
                             : "часов")),
                     mDiff,
-                    ((mDiff == 1 || mDiff % 10 == 1) ? "минута" : ((mDiff % 10 == 2 || mDiff % 10 == 3 ||
+                    ((mDiff == 1 || (mDiff % 10 == 1 && mDiff > 11)) ? "минута" : ((mDiff % 10 == 2 || mDiff % 10 == 3 ||
                             mDiff % 10 == 4) ? "минуты" : "минут")));
         } else {
             ts = String.format("%d %s", mDiff,
-                    ((mDiff == 1 || mDiff % 10 == 1) ? "минута" : ((mDiff % 10 == 2 || mDiff % 10 == 3 ||
+                    ((mDiff == 1 || (mDiff % 10 == 1 && mDiff > 11) ? "минута" : ((mDiff % 10 == 2 || mDiff % 10 == 3 ||
                             mDiff % 10 == 4) ? "минуты" : "минут")));
         }
 
