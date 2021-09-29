@@ -153,7 +153,7 @@ public class Qify {
     }
 
     @Test
-    public static void test1() {
+    public void doTests() {
 
         /*
         String S = "Привет, ты и дела, и еще Тектоническая плита";
@@ -165,7 +165,7 @@ public class Qify {
         System.out.println(text("Тектоническая", true));
         System.out.println(text("Тектоническая", false));
         */
-        System.out.println(text("яма, кот, ты, кит, тля, еще, кто, зря"));
+        System.out.println(text("майский"));
         if (true) return;
 
         System.out.println(text("в ходе прокурорских проверок возбуждено 10 уголовных дел о коррупции"));
@@ -178,11 +178,6 @@ public class Qify {
     }
 
     public static void main(String[] args) {
-        /*
-        test1();
-        if (1 == 1) {
-            return;
-        }*/
         String text = String.join(" ", args);
         if (StringUtils.isNotBlank(text)) {
             String qtext = text(text);
@@ -193,7 +188,7 @@ public class Qify {
             }
         } else {
             System.err.println("Usage: Qify <TEXT>");
-            test1();
+            new Qify().doTests();
         }
     }
 }
