@@ -88,7 +88,7 @@ public class Kovtok implements Plugin {
                             mDiff % 10 == 4) ? "минуты" : "минут")));
         } else {
             ts = String.format("%d %s", mDiff,
-                    ((mDiff == 1 || (mDiff % 10 == 1 && mDiff > 11) ? "минута" : ((mDiff % 10 == 2 || mDiff % 10 == 3 ||
+                    ((mDiff == 1 || (mDiff % 10 == 1 && mDiff > 11)) ? "минута" : ((mDiff % 10 == 2 || mDiff % 10 == 3 ||
                             mDiff % 10 == 4) ? "минуты" : "минут")));
         }
 
