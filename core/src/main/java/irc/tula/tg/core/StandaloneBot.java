@@ -302,7 +302,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
 
-    private boolean chanserv(Long chatId, Nickname nickName, String text) {
+    protected boolean chanserv(Long chatId, Nickname nickName, String text) {
         boolean answered = false;
         log.info("chanserv: ({}, {}, {})", chatId, nickName, text);
         String replyNickName = nickName.toString();

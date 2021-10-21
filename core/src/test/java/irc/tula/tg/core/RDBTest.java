@@ -1,3 +1,5 @@
+package irc.tula.tg.core;
+
 import irc.tula.tg.core.Cave;
 import irc.tula.tg.core.RDBResource;
 import lombok.extern.slf4j.Slf4j;

@@ -102,7 +102,7 @@ public class BotCore {
 
     public Optional<Message> sayOnChannel(Long chatId, String text) {
         // Typing notification
-        if (text != null && text.length() > LONG_SENTENSE) {
+        if (config.getAlwaysShowTyping() || (text != null && text.length() > LONG_SENTENSE)) {
             typeOnChannel(chatId);
         }
 

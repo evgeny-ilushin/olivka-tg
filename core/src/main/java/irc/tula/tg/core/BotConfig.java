@@ -29,6 +29,8 @@ public class BotConfig {
     private boolean debug;
     private boolean runTests = false;
 
+    private Boolean alwaysShowTyping = true;
+
     public boolean isAdmin(String nick) {
         return (admins != null && admins.size() > 0 && admins.contains(nick));
     }
@@ -58,7 +60,7 @@ public class BotConfig {
 
     @Transient
     public static BotConfig getSample() {
-        return new BotConfig("/home/mybot", "123123123:454564", Cave.getEncoding(), Arrays.asList("@murzambek", "@zloy"), Arrays.asList("bot", "MyBot", "@my_bot_nick"), Arrays.asList("123"), true, false);
+        return new BotConfig("/home/mybot", "123123123:454564", Cave.getEncoding(), Arrays.asList("@murzambek", "@zloy"), Arrays.asList("bot", "MyBot", "@my_bot_nick"), Arrays.asList("123"), true, false, true);
     }
 
     public String asTable() {
@@ -71,6 +73,7 @@ public class BotConfig {
                 ", ignore=" + ignore +
                 ", debug=" + debug +
                 ", runTests=" + runTests +
+                ", alwaysShowTyping=" + alwaysShowTyping +
                 '}';
     }
 }

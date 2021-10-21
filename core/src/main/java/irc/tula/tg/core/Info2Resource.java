@@ -4,8 +4,10 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +56,8 @@ public class Info2Resource {
 
     private void reload() {
         String fullPath = directoryPath + NewWorld.PATH_SEPARATOR + fileName;
+        String s = Paths.get(".").toAbsolutePath().normalize().toString();
+        log.info("Current directory: " + s);
         try (Stream<String> stream = Files.lines(Paths.get(fullPath), Charset.forName(encoding))) {
             stream.forEach(line -> {
                 if (StringUtils.isNotBlank(line)) {

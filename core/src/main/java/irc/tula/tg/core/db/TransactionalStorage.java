@@ -3,6 +3,8 @@ package irc.tula.tg.core.db;
 import irc.tula.tg.core.db.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+
+/*
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -12,12 +14,12 @@ import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-
 import javax.persistence.Query;
+*/
 
 @Slf4j
 public class TransactionalStorage {
-
+/*
     private static final SessionFactory sessionFactory;
 
     static {
@@ -107,4 +109,5 @@ public class TransactionalStorage {
             }
         }
     }
+*/
 }
