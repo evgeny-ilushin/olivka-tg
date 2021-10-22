@@ -70,6 +70,8 @@ public class WebCap implements Plugin {
     private String callWcScript(ChannelBot bot, IncomingMessage msg, String scriptName, String[] params) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future future = executor.submit(new WebCapTask(this, bot, msg, scriptName, params));
+        log.info("async - callScript: {} {} - {}s", msg, scriptName, SCRIPT_TIME_LIMIT_SECONDS);
+
         try {
             return (String)future.get(SCRIPT_TIME_LIMIT_SECONDS, TimeUnit.SECONDS);
         } catch (Exception e) {
