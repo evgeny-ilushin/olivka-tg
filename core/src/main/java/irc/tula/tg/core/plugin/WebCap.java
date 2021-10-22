@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.*;
 
 @Slf4j
 public class WebCap implements Plugin {
@@ -20,6 +21,7 @@ public class WebCap implements Plugin {
     public static final String[] ALIASES = { "wcap", "wc" };
 
     private static final String DONNO_RDB = "donno";
+    private static final long SCRIPT_TIME_LIMIT_SECONDS = 10;
 
     private boolean loaded = false;
 
@@ -66,6 +68,20 @@ public class WebCap implements Plugin {
     }
 
     private String callWcScript(ChannelBot bot, IncomingMessage msg, String scriptName, String[] params) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future future = executor.submit(new WebCapTask(this, bot, msg, scriptName, params));
+        try {
+            return (String)future.get(SCRIPT_TIME_LIMIT_SECONDS, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            e.printStackTrace();
+            future.cancel(true);
+        } finally {
+            executor.shutdownNow();
+        }
+        return null;
+    }
+
+    private String callWcScript_limited(ChannelBot bot, IncomingMessage msg, String scriptName, String[] params) {
         log.info("callScript: {} {}", msg, scriptName);
         String sres = null;
 
@@ -95,5 +111,27 @@ public class WebCap implements Plugin {
             ex.printStackTrace();
         }
         return sres;
+    }
+
+    class WebCapTask implements Callable<String> {
+
+        private final WebCap webCap;
+        private final ChannelBot bot;
+        private final IncomingMessage msg;
+        private final String scriptName;
+        private final String[] params;
+
+        public WebCapTask(WebCap webCap, ChannelBot bot, IncomingMessage msg, String scriptName, String[] params) {
+            this.webCap = webCap;
+            this.bot = bot;
+            this.msg = msg;
+            this.scriptName = scriptName;
+            this.params = params;
+        }
+
+        @Override
+        public String call() throws Exception {
+            return webCap.callWcScript_limited(bot, msg, scriptName, params);
+        }
     }
 }
