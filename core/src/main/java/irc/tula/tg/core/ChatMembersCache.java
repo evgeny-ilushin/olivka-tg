@@ -10,22 +10,22 @@ import java.util.HashMap;
 @Data
 public class ChatMembersCache implements Serializable {
 
-    private HashMap<Long, HashMap<Integer, Nickname>> members;
+    private HashMap<Long, HashMap<Long, Nickname>> members;
 
     public ChatMembersCache() {
         members = new HashMap<>();
     }
 
-    public Nickname get(Long chatId, Integer userId) {
-        HashMap<Integer, Nickname> chatMembers = members.get(chatId);
+    public Nickname get(Long chatId, Long userId) {
+        HashMap<Long, Nickname> chatMembers = members.get(chatId);
         if (chatMembers != null) {
             return chatMembers.get(userId);
         }
         return null;
     }
 
-    public Nickname put(Long chatId, Integer userId, Nickname nickname) {
-        HashMap<Integer, Nickname> chatMembers = members.get(chatId);
+    public Nickname put(Long chatId, Long userId, Nickname nickname) {
+        HashMap<Long, Nickname> chatMembers = members.get(chatId);
         if (chatMembers == null) {
             chatMembers = new HashMap<>();
             chatMembers.put(userId, nickname);
@@ -38,15 +38,15 @@ public class ChatMembersCache implements Serializable {
     }
 
     public Collection<Nickname> list(Long chatId) {
-        HashMap<Integer, Nickname> chatMembers = members.get(chatId);
+        HashMap<Long, Nickname> chatMembers = members.get(chatId);
         if (chatMembers != null) {
             return chatMembers.values();
         }
         return null;
     }
 
-    public void remove(Long chatId, Integer userId) {
-        HashMap<Integer, Nickname> chatMembers = members.get(chatId);
+    public void remove(Long chatId, Long userId) {
+        HashMap<Long, Nickname> chatMembers = members.get(chatId);
         if (chatMembers != null) {
             chatMembers.remove(userId);
         }

@@ -23,7 +23,7 @@ import java.util.Objects;
 })
 public class Nickname {
     @JsonProperty("id")
-    private Integer id;
+    private Long id;
 
     @JsonProperty("text")
     private String text;
@@ -41,7 +41,7 @@ public class Nickname {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date lastSeen;
 
-    public Nickname(Integer id, String text, boolean isUserName) {
+    public Nickname(Long id, String text, boolean isUserName) {
         this.id = id;
         this.text = text;
         this.isUserName = isUserName;
