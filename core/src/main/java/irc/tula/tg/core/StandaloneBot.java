@@ -903,7 +903,10 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         */
         //boolean csRes = bot.chanserv(-1001082390874L, new Nickname(10, "123", true), "гнилой, кохуита ");
 
-        boolean csRes = bot.chanserv(-1001082390874L, new Nickname(10L, "zloy", true), "глоток");
+        //boolean csRes = bot.chanserv(-1001082390874L, new Nickname(10L, "zloy", true), "глоток");
+
+        boolean csRes = bot.chanserv(-547476212L, new Nickname(412132074L, "@ncuxonycbka", true), "ну что?");
+
 
         if (true) {
             return;

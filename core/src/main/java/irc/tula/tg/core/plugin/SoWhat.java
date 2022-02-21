@@ -9,6 +9,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
+
 public class SoWhat implements Plugin {
 
     public static final String PLUGIN_NAME = "sowhat";
@@ -127,11 +129,11 @@ public class SoWhat implements Plugin {
             for (DateItem i : today) {
                 if (personal) {
                     Date ts = new Date(1000L * i.getTs());
-                    String l = "" + (ndx++) + ". <i>" + i.getText() + "</i> (" + i.getNick() + ", " + format.format(ts) + ")";
+                    String l = "" + (ndx++) + ". <i>" + escapeHtml4(i.getText()) + "</i> (" + i.getNick() + ", " + format.format(ts) + ")";
                     dateList.append(l+"\n");
                     //bot.sayOnChannel(msg.getChatId(), l);
                 } else {
-                    String l = "" + (ndx++) + ". <i>" + i.getText() + "</i>";
+                    String l = "" + (ndx++) + ". <i>" + escapeHtml4(i.getText()) + "</i>";
                     //bot.sayOnChannel(msg.getChatId(), l);
                     dateList.append(l+"\n");
                 }

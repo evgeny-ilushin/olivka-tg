@@ -16,6 +16,9 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.util.Optional;
 
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
+
+
 @Slf4j
 public class BotCore {
     private static final int LONG_SENTENSE = 20;
@@ -101,6 +104,8 @@ public class BotCore {
     }
 
     public Optional<Message> sayOnChannel(Long chatId, String text) {
+        log.info("TG.sending to {}: {}", chatId, text);
+
         // Typing notification
         if (config.getAlwaysShowTyping() || (text != null && text.length() > LONG_SENTENSE)) {
             typeOnChannel(chatId);
@@ -131,7 +136,7 @@ public class BotCore {
 
             SendResponse sendResponse = tg.execute(request);
             boolean ok = sendResponse.isOk();
-            log.info("TG.send: {}, {} - {}", sendResponse, sendResponse.message(), ok ? "OK" : "FAILED");
+            log.info("TG.send: {}, {} - {}", sendResponse, sendResponse.message(), ok ? "OK" : ("FAILED: " + sendResponse.description()));
             return Optional.of(sendResponse.message());
 
         } catch (Exception ex) {
