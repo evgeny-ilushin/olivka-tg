@@ -16,9 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.util.Optional;
 
-import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
-
-
 @Slf4j
 public class BotCore {
     private static final int LONG_SENTENSE = 20;
@@ -123,6 +120,7 @@ public class BotCore {
 
             if (config.isDebug()) {
                 log.info("FAKE SEND: {} {}", chatId, text);
+                System.err.println("FAKE SEND: {" + chatId + "}: " + text);
                 return Optional.empty();
             }
 

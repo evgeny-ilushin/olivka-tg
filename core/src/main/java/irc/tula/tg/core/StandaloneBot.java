@@ -25,6 +25,9 @@ import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -51,6 +54,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
     private static final int MIN_AUTOMATH_LENGTH = 3;
 
     private static final boolean QIFY_UNKNOWN = true;
+
+    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMM yyyy, HH:MM z");
 
     // Answered messages
     Cache<String, String> msgCache = null;
@@ -320,11 +325,15 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         Nickname nCache = members.get(chatId, from_id);
 
         if (nCache != null) {
-            // Already seen
+            // Already seen as different nickName
             if (!(""+nCache).equals(""+nickName)) {
                 // Renamed
-                members.put(chatId, from_id, nickName);
+                //members.put(chatId, from_id, nickName);
                 sayOnChannel(chatId, "теперь я знаю " + nCache + " как " + nickName + " \uD83D\uDE0E");
+                //saveState();
+            } else {
+                // Just update lastSeen
+                members.put(chatId, from_id, nickName);
                 saveState();
             }
         } else {
@@ -361,6 +370,11 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
         // Some auto math
         if (processAutoCalc(msg)) {
+            return true;
+        }
+
+        // Some bare nick name
+        if (processNicknameInfo(msg)) {
             return true;
         }
 
@@ -487,6 +501,28 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             ex.printStackTrace();
         }
         return false;
+    }
+
+    private boolean processNicknameInfo(IncomingMessage msg) {
+        Nickname speaker = members.get(msg.getChatId(), msg.getNickName().getId());
+        if (speaker != null) {
+            if (msg.getText() != null && (msg.getText().equals(speaker.getText()) || msg.getText().equals(speaker.toString()))) {
+                sayOnChannel(msg.getChatId(), msg.getNickName() + NewWorld.NICK_SEPARATOR + "это ты");
+                return true;
+            }
+            for (Nickname n : members.list(msg.getChatId())) {
+                if (msg.getText().equals(n.getText()) || msg.getText().equals(n.toString())) {
+                    showPublicNickInfo(msg, n);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void showPublicNickInfo(IncomingMessage msg, Nickname n) {
+        ZonedDateTime seen = n.getLastSeen().toInstant().atZone(ZoneId.of("Europe/Moscow"));
+        sayOnChannel(msg.getChatId(), msg.getNickName() + NewWorld.NICK_SEPARATOR + n + " последний раз мяукал " + simpleDateFormat.format(n.getLastSeen()));
     }
 
     private boolean processCommand(IncomingMessage msg) {
