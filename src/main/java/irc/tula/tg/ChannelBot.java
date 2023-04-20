@@ -1,0 +1,22 @@
+package irc.tula.tg;
+
+import com.pengrad.telegrambot.model.Message;
+import irc.tula.tg.data.MyObjectMapper;
+import irc.tula.tg.entity.IncomingMessage;
+import irc.tula.tg.entity.Nickname;
+import irc.tula.tg.util.TextLog;
+
+import java.util.Optional;
+
+public interface ChannelBot extends ChatActions {
+    void answerText(IncomingMessage msg, String reply);
+    void answerDonno(IncomingMessage msg);
+    void answerRdb(IncomingMessage msg, String rdb);
+    Nickname randomNick(Long chatId);
+    RDBResource getRdbByName(String name);
+    TextLog getCallbacks();
+    //HashMap<Integer, Nickname> getMembers();
+    Info2Resource getInfo2();
+    MyObjectMapper getMapper();
+    BotConfig getConfig();
+}
