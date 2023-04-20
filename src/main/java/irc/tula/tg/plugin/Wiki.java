@@ -74,7 +74,8 @@ public class Wiki implements Plugin {
     }
 }
 class WikiHelper {
-    final String BASE_URL="https://en.wikipedia.org/api/rest_v1/page/summary/";
+    final String BASE_URL = "https://en.wikipedia.org/api/rest_v1/page/summary/";
+    final String BASE_URL_R = "https://ru.wikipedia.org/api/rest_v1/page/summary/";
     String subject=null;
     String displayTitle="";
     String imageURL="";
@@ -89,7 +90,7 @@ class WikiHelper {
     private void getData() {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
-                .url(BASE_URL+subject)
+                .url(urlFor(subject) + subject)
                 .get()
                 .build();
         try {
@@ -107,6 +108,15 @@ class WikiHelper {
         catch (IOException | ParseException e) {
             e.printStackTrace();
         }
+    }
+
+    private String urlFor(String text) {
+        for (int i = 0; i < text.length(); i++) {
+            if (Character.UnicodeBlock.of(text.charAt(i)).equals(Character.UnicodeBlock.CYRILLIC)) {
+                return BASE_URL_R;
+            }
+        }
+        return BASE_URL;
     }
 
     public String getDisplayTitle() {
