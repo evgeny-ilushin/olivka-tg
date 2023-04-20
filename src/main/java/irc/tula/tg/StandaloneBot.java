@@ -32,20 +32,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBot, LambdaBot {
-
-    // olivka
-    //private static final String DEFAULT_TOKEN = "294103149:AAGPawepBdjAtu9z9aKDj2rLwwdNt0UDi9E";
-    //private static final String[] BOT_NAMES = { "olivka", "оливка", "@OlivkaIrcBot" };
-
-    // rotten
-    //private static final String DEFAULT_TOKEN = "668163913:AAE98c1hN0O5m1kyE3e9XgBLLQolN96fpH4";
-    //private static final String[] BOT_NAMES = { "rotten", "гнилой", "@rottenbot2018_bot" };
-
-    //private static final String BOT_HOME = "/home/ec2-user/bin/bots/data";
-
-    private static final boolean meatOnSecondPhrase = true;
-
+public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBot {
     private static final String DONNO_RDB = "donno";
 
     private static final String MEMBERS_CACHE = "members.json";
@@ -61,7 +48,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
     public BotConfig getConfig() { return config; }
 
     @Getter
-    private TextLog callbacks;
+    final private TextLog callbacks;
 
     // Members
     @Getter
@@ -70,26 +57,25 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
     // Info2
     @Getter
-    Info2Resource info2 = new Info2Resource(getConfig().getDataDirName(), config.getEncoding());
+    final Info2Resource info2 = new Info2Resource(getConfig().getDataDirName(), config.getEncoding());
 
     // RDBs
     @Getter
-    private HashMap<String, RDBResource> rdbStore = new HashMap<>();
+    private final HashMap<String, RDBResource> rdbStore = new HashMap<>();
 
     // DBs
     @Getter
     private final MyObjectMapper mapper;
 
     // Pluigins
-    HashMap<String, Plugin> plugins = new HashMap<>();
+    final HashMap<String, Plugin> plugins = new HashMap<>();
 
     public StandaloneBot(BotConfig config) {
         super(config);
         callbacks = new TextLog(getConfig().getLogDir("updates.log"));
         mapper = new JsonObjectMapper(getConfig().getDataDirName());
-        loadState();
+        loadCaches();
         loadPlugins();
-        loadCore();
     }
 
     public static void main(String[] args) {
@@ -159,18 +145,10 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                 new YWeather(),
                 new WebCap(),
                 new Sticker(),
-                new Kovtok()
+                new Kovtok(),
+                new Wiki()
         }).forEach(this::addPlugin);
         plugins.forEach((k,v) -> v.initialize(this));
-    }
-
-    private void loadCore() {
-        msgCache = CacheBuilder.newBuilder()
-                .maximumSize(10000)
-                .expireAfterWrite(10, TimeUnit.MINUTES)
-                .build();
-
-        log.info("### MSG Cache created: {}", msgCache.stats());
     }
 
     protected boolean wasAnsweredRecently(Update update) {
@@ -425,27 +403,19 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         }
     }
 
-    private void loadState() {
+    private void loadCaches() {
         try {
             ChatMembersCache m  =  mapper.read(MEMBERS_CACHE, ChatMembersCache.class);
             if (m != null) {
                 members = m;
             }
-            /*
-            if (m != null && m.length > 0) {
-                log.info("Loaded MEMBERS cache: {}, {} nickname(s)", MEMBERS_CACHE, m.length);
-                for (Object o: m) {
-                    Nickname n = (Nickname)o;
 
-                    if (n.getId() != null) {
-                        members.put(n.getId(), n);
-                    } else {
-                        log.info("No id for MEMBER {}", n);
-                    }
-                }
-                //members = m;
-            }
-            */
+            msgCache = CacheBuilder.newBuilder()
+                    .maximumSize(10000)
+                    .expireAfterWrite(10, TimeUnit.MINUTES)
+                    .build();
+
+            log.info("### MSG Cache created: {}", msgCache.stats());
         }
         catch (Exception ex) {
             log.info("No MEMBERS file");
@@ -988,7 +958,6 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         String p1_dev1 = "{ \"update_id\":\"18322332\", \"message\":\"null\", \"edited_message\":\"null\", \"channel_post\":\"Message{message_id=7, from=null, date=1565769693, chat=Chat{id=-1001343308314, type=channel, first_name='null', last_name='null', username='olivka_dev', title='olivka development', all_members_are_administrators=null, photo=null, description='null', invite_link='null', pinned_message=null, sticker_set_name='null', can_set_sticker_set=null}, forward_from=null, forward_from_chat=null, forward_from_message_id=null, forward_signature='null', forward_date=null, reply_to_message=null, edit_date=null, media_group_id='null', author_signature='null', text='2', entities=null, caption_entities=null, audio=null, document=null, animation=null, game=null, photo=null, sticker=null, video=null, voice=null, video_note=null, caption='null', contact=null, location=null, venue=null, new_chat_member=null, new_chat_members=null, left_chat_member=null, new_chat_title='null', new_chat_photo=null, delete_chat_photo=null, group_chat_created=null, supergroup_chat_created=null, channel_chat_created=null, migrate_to_chat_id=null, migrate_from_chat_id=null, pinned_message=null, invoice=null, successful_payment=null, connected_website='null', passport_data=null}\", \"edited_channel_post\":\"null\", \"inline_query\":\"null\", \"chosen_inline_result\":\"null\", \"callback_query\":\"null\", \"shipping_query\":\"null\", \"pre_checkout_query\":\"null\" }";
     }
 
-    @Override
     public Object chanserv(Object payload) {
         if (config.isDebug()) {
             return chanserv(-1L, new Nickname(10L, "DEBUG", true), "" + payload);

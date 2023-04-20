@@ -8,7 +8,11 @@ import irc.tula.tg.util.TextLog;
 
 import java.util.Optional;
 
-public interface ChannelBot extends ChatActions {
+public interface ChannelBot {
+    void typeOnChannel(Long chatId);
+    void sendImageToChat(Long chatId, String pathToFile);
+    Optional<Message> sayOnChannel(Long chatId, String text);
+    Optional<Message> sendSticker(Long chatId, String text);
     void answerText(IncomingMessage msg, String reply);
     void answerDonno(IncomingMessage msg);
     void answerRdb(IncomingMessage msg, String rdb);

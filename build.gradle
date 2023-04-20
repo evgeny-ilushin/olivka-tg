@@ -21,6 +21,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.26'
     implementation "org.apache.commons:commons-lang3:3.12.0"
     implementation "org.slf4j:slf4j-api:1.7.30"
+    testImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.7'
     testImplementation "org.junit.jupiter:junit-jupiter:RELEASE"
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.2"
     testImplementation "org.junit.platform:junit-platform-commons:RELEASE"
@@ -30,6 +31,8 @@ dependencies {
     implementation "junit:junit:4.12"
     implementation "com.github.pengrad:java-telegram-bot-api:6.3.0"
     implementation "org.telegram:telegramapi:66.2"
+    implementation group: 'com.squareup.okhttp', name: 'okhttp', version: '2.7.5'
+    implementation group: 'org.apache.clerezza.ext', name: 'org.json.simple', version: '0.4'
 }
 
 

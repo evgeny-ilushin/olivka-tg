@@ -17,7 +17,7 @@ import java.io.File;
 import java.util.Optional;
 
 @Slf4j
-public class BotCore implements ChatActions {
+public class BotCore {
     private static final int LONG_SENTENSE = 20;
     private static final String STICKER_PREFIX = "sticker:";
 
