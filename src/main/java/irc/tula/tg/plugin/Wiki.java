@@ -5,6 +5,8 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import irc.tula.tg.ChannelBot;
 import irc.tula.tg.entity.IncomingMessage;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -13,9 +15,11 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 public class Wiki implements Plugin {
     private static final String[] PREFS = { "wtf ", "wiki " };
     private static final int MAX_WIKI = 500;
+    private static final boolean tryRussianFirst = true;
     private static final String DOTES = "...";
 
     @Override
@@ -74,6 +78,7 @@ public class Wiki implements Plugin {
     }
 }
 class WikiHelper {
+    private static final boolean tryRussianFirst = true;
     final String BASE_URL = "https://en.wikipedia.org/api/rest_v1/page/summary/";
     final String BASE_URL_R = "https://ru.wikipedia.org/api/rest_v1/page/summary/";
     String subject=null;
@@ -88,9 +93,22 @@ class WikiHelper {
     }
 
     private void getData() {
+        if (tryRussianFirst) {
+            if (containsCyrilic(subject)) {
+                getData(BASE_URL_R);
+                if (extractText == null || StringUtils.isBlank(extractText)) {
+                    getData(BASE_URL);
+                }
+            }
+        }
+        else {
+            getData(urlFor(subject));
+        }
+    }
+    private void getData(String wikiUrl) {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
-                .url(urlFor(subject) + subject)
+                .url(wikiUrl + subject)
                 .get()
                 .build();
         try {
@@ -117,6 +135,10 @@ class WikiHelper {
             }
         }
         return BASE_URL;
+    }
+
+    private Boolean containsCyrilic(String text) {
+        return text.chars().allMatch(e -> !Character.UnicodeBlock.of(e).equals(Character.UnicodeBlock.CYRILLIC));
     }
 
     public String getDisplayTitle() {
