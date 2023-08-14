@@ -4,6 +4,7 @@ import irc.tula.tg.ChannelBot;
 import irc.tula.tg.entity.IncomingMessage;
 import irc.tula.tg.entity.DateInfoCollection;
 import irc.tula.tg.entity.DateItem;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.SimpleDateFormat;
@@ -11,6 +12,7 @@ import java.util.*;
 
 import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 
+@Slf4j
 public class SoWhat implements Plugin {
 
     public static final String PLUGIN_NAME = "sowhat";
@@ -50,11 +52,16 @@ public class SoWhat implements Plugin {
     public void initialize(ChannelBot bot) {
 
         if (!loaded) {
-            database = bot.getMapper().read(SOWHAT_DB, DateInfoCollection.class);
-            Collections.sort(database.getItems());
-            //bot.getMapper().write(SOWHAT_DB+".new.json", database);
+            try {
+                database = bot.getMapper().read(SOWHAT_DB, DateInfoCollection.class);
+                Collections.sort(database.getItems());
+                //bot.getMapper().write(SOWHAT_DB+".new.json", database);
 
-            loaded = true;
+                loaded = true;
+            }
+            catch (Exception ex) {
+                log.error("SoWhat initialize failed: {}", ex);
+            }
         }
     }
 

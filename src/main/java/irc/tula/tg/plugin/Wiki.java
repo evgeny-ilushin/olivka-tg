@@ -14,6 +14,7 @@ import org.json.simple.parser.ParseException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Slf4j
 public class Wiki implements Plugin {
@@ -100,6 +101,9 @@ class WikiHelper {
                     getData(BASE_URL);
                 }
             }
+            else {
+                getData(urlFor(subject));
+            }
         }
         else {
             getData(urlFor(subject));
@@ -137,8 +141,20 @@ class WikiHelper {
         return BASE_URL;
     }
 
-    private Boolean containsCyrilic(String text) {
+    private Boolean containsCyrilic_ГОВНО(String text) {
         return text.chars().allMatch(e -> !Character.UnicodeBlock.of(e).equals(Character.UnicodeBlock.CYRILLIC));
+    }
+
+    private Boolean containsCyrilic(String text) {
+        final Pattern pattern = Pattern.compile(
+                "[" +                   //начало списка допустимых символов
+                        "а-яА-ЯёЁ" +    //буквы русского алфавита
+                        "\\d" +         //цифры
+                        "\\s" +         //знаки-разделители (пробел, табуляция и т.д.)
+                        "\\p{Punct}" +  //знаки пунктуации
+                        "]" +                   //конец списка допустимых символов
+                        "*");
+        return pattern.matcher(text).matches();
     }
 
     public String getDisplayTitle() {
