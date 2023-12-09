@@ -30,9 +30,14 @@ public class Glotok implements Plugin {
     }
 
     public static String infoR(ZonedDateTime now) {
-        int kHour = switch (now.getDayOfWeek()) {
-            case MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY -> KOVTOK_HOUR_14;
-            default -> KOVTOK_HOUR_12;
+        int kHour = KOVTOK_HOUR_12;
+        switch (now.getDayOfWeek()) {
+            case MONDAY:
+            case TUESDAY:
+            case WEDNESDAY:
+            case THURSDAY:
+            case FRIDAY:
+                kHour = KOVTOK_HOUR_14;
         };
 
         ZonedDateTime kovtokTime = now.withHour(kHour).withMinute(0);
