@@ -9,12 +9,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 
-public class Kovtok implements Plugin {
+public class Goodok implements Plugin {
 
     private static final int KOVTOK_HOUR = 18;
 
-    public static final String PLUGIN_NAME_U = "kovtok";
-    public static final String PLUGIN_NAME_R = "glotok";
+    public static final String PLUGIN_NAME_U = "goodok";
+    public static final String PLUGIN_NAME_R = "guodok";
     public static final String PLUGIN_NAME = PLUGIN_NAME_U;
 
     private static long unixTime() {

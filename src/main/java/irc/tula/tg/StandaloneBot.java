@@ -145,7 +145,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                 new YWeather(),
                 new WebCap(),
                 new Sticker(),
-                new Kovtok(),
+                new Goodok(),
+                new Glotok(),
                 new Wiki()
         }).forEach(this::addPlugin);
         plugins.forEach((k,v) -> v.initialize(this));
