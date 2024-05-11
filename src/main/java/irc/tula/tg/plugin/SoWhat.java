@@ -10,8 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
-
 @Slf4j
 public class SoWhat implements Plugin {
 
@@ -157,6 +155,11 @@ public class SoWhat implements Plugin {
         }
 
         return false;
+    }
+
+    private String escapeHtml4(String source) {
+        //return org.apache.commons.lang3.StringEscapeUtils.escapeHtml4(source);
+        return source;
     }
 
     @Override
