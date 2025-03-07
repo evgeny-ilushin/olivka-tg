@@ -105,7 +105,7 @@ public class Glotok implements Plugin {
     @Override
     public boolean process(ChannelBot bot, IncomingMessage msg, String pluginName, String[] params) {
         String info = infoR();
-        bot.sayOnChannel(msg.getChatId(), msg.getNickName() + ", " + info);
+        bot.sayOnChannel(msg, info);
         return true;
     }
 
@@ -126,7 +126,7 @@ public class Glotok implements Plugin {
         t(t1);
         t1 = now.withHour(21).withMinute(59);
         t(t1);
-        t1 = now.withHour(21).withMinute(58);
+        t1 = now.withHour(0).withMinute(58);
         t(t1);
     }
 

@@ -151,7 +151,7 @@ public class SoWhat implements Plugin {
                     break;
                 }
             }
-            bot.sayOnChannel(msg.getChatId(), dateList.toString());
+            bot.sayOnChannel(msg, dateList.toString());
         }
 
         return false;

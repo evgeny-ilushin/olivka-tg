@@ -122,7 +122,7 @@ public class Goodok implements Plugin {
         } else {
             info = infoU();
         }
-        bot.sayOnChannel(msg.getChatId(), msg.getNickName() + ", " + info);
+        bot.sayOnChannel(msg, info);
         return true;
     }
 

@@ -3,7 +3,8 @@ package irc.tula.tg;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.request.*;
+import com.pengrad.telegrambot.model.request.ChatAction;
+import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.*;
 import com.pengrad.telegrambot.response.BaseResponse;
 import com.pengrad.telegrambot.response.SendResponse;
@@ -14,8 +15,6 @@ import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -109,16 +108,8 @@ public class BotCore {
         return sayOnChannel(msg.getChatId(), reply, msg.isPersonal()? originalMessageId : null);
     }
 
-    public Optional<Message> sayOnChannel(Long chatId, String text) {
-        return sayOnChannel(chatId, text, null, null);
-    }
-
     public Optional<Message> sayOnChannel(Long chatId, String text, Integer replyToMessageId) {
-        return sayOnChannel(chatId, text, replyToMessageId, null);
-    }
-
-    public Optional<Message> sayOnChannel(Long chatId, String text, Integer replyToMessageId, List<String> options) {
-        log.info("TG.sending to {}: {}", chatId, text);
+        log.info("TG.sending to {}-{}: {}", chatId, replyToMessageId, text);
 
         // Typing notification
         if (!config.isDebug() && config.getAlwaysShowTyping() || (text != null && text.length() > LONG_SENTENSE)) {
@@ -157,12 +148,14 @@ public class BotCore {
                 request.replyToMessageId(replyToMessageId);
             }
 
+            /*
             if (options !=null) {
                 List<KeyboardButton> buttons = new ArrayList<>();
                 options.forEach(opt -> buttons.add(new KeyboardButton(opt)));
                 Keyboard keyboard = new ReplyKeyboardMarkup(buttons.toArray(new KeyboardButton[0]));
                 request.replyMarkup(keyboard);
             }
+            */
 
             SendResponse sendResponse = tg.execute(request);
             boolean ok = sendResponse.isOk();

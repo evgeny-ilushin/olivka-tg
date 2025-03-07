@@ -311,7 +311,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             if (!(""+nCache).equals(""+nickName)) {
                 // Renamed
                 //members.put(chatId, from_id, nickName);
-                sayOnChannel(chatId, "теперь я знаю " + nCache + " как " + nickName + " \uD83D\uDE0E");
+                sayOnChannel(chatId, "теперь я знаю " + nCache + " как " + nickName + " \uD83D\uDE0E", originalMessage.messageId());
                 //saveState();
             } else {
                 // Just update lastSeen
@@ -320,7 +320,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             }
         } else {
             members.put(chatId, from_id, nickName);
-            sayOnChannel(chatId, "теперь я знаю " + nickName + " \uD83D\uDE0E");
+            sayOnChannel(chatId, "теперь я знаю " + nickName + " \uD83D\uDE0E", originalMessage.messageId());
             saveState();
         }
 
@@ -480,7 +480,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         Nickname speaker = members.get(msg.getChatId(), msg.getNickName().getId());
         if (speaker != null) {
             if (msg.getText() != null && (msg.getText().equals(speaker.getText()) || msg.getText().equals(speaker.toString()))) {
-                sayOnChannel(msg.getChatId(), msg.getNickName() + NewWorld.NICK_SEPARATOR + "это ты");
+                sayOnChannel(msg, "это ты");
                 return true;
             }
             for (Nickname n : members.list(msg.getChatId())) {
@@ -495,7 +495,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
     private void showPublicNickInfo(IncomingMessage msg, Nickname n) {
         ZonedDateTime seen = n.getLastSeen().toInstant().atZone(ZoneId.of("Europe/Moscow"));
-        sayOnChannel(msg.getChatId(), msg.getNickName() + NewWorld.NICK_SEPARATOR + n + " последний раз мяукал " + simpleDateFormat.format(n.getLastSeen()));
+        sayOnChannel(msg, n + " последний раз мяукал " + simpleDateFormat.format(n.getLastSeen()));
     }
 
     private boolean processCommand(IncomingMessage msg) {
@@ -590,14 +590,12 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             }
 
             if (sayOk[0]) {
-                String reply = msg.getNickName() + NewWorld.NICK_SEPARATOR + sayOkText;
-                sayOnChannel(msg.getChatId(), reply);
+                sayOnChannel(msg, sayOkText);
                 return true;
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            String reply = msg.getNickName() + NewWorld.NICK_SEPARATOR + ex.getMessage();
-            sayOnChannel(msg.getChatId(), reply);
+            sayOnChannel(msg, ex.getMessage());
             return true;
         }
 
@@ -755,7 +753,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
     public void answerText(IncomingMessage msg, String text) {
         log.info("answerText: {} {}", msg, text);
         String fullText = caveReplace(msg.getChatId(), text, msg.getNickName());
-        sayOnChannel(msg.getChatId(), fullText);
+        sayOnChannel(msg, fullText);
     }
 
     private String caveReplace(Long chatId, String text, Nickname nickName) {
@@ -775,7 +773,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             return;
 
         String fullText = caveReplace(msg.getChatId(), nextString(dn), msg.getNickName());
-        sayOnChannel(msg.getChatId(), fullText);
+        sayOnChannel(msg, fullText);
     }
 
     public String nextString(RDBResource r) {
@@ -792,7 +790,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                 return;
 
             String fullText = caveReplace(msg.getChatId(), nextString(dn), msg.getNickName());
-            sayOnChannel(msg.getChatId(), fullText);
+            sayOnChannel(msg, fullText);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
