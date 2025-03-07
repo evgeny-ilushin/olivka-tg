@@ -297,8 +297,6 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         String replyNickName = nickName.toString();
         Long from_id = nickName.getId();
 
-        callbacks.add(toJson(nickName));
-
         boolean ignoreMessage = getConfig().isIgnored(nickName.toString());
         if (ignoreMessage) {
             log.info("*ignoring message from [" + nickName.toString() + "]*");
@@ -307,7 +305,6 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
         // Last seen
         nickName.notice();
-
         Nickname nCache = members.get(chatId, from_id);
 
         if (nCache != null) {
@@ -824,13 +821,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         return members.randomAt(chatId);
     }
 
-    private static String toJson(Object u) {
-        try {
-            return JsonObjectMapper.getMapper().writeValueAsString(u);
-        } catch (JsonProcessingException e) {
-            // return "{ \"update_id\":\"" + u.updateId() + "\", \"message\":\"" + u.message() + "\", \"edited_message\":\"" + u.editedMessage() + "\", \"channel_post\":\"" + u.channelPost() + "\", \"edited_channel_post\":\"" + u.editedChannelPost() + "\", \"inline_query\":\"" + u.inlineQuery() + "\", \"chosen_inline_result\":\"" + u.chosenInlineResult() + "\", \"callback_query\":\"" + u.callbackQuery() + "\", \"shipping_query\":\"" + u.shippingQuery() + "\", \"pre_checkout_query\":\"" + u.preCheckoutQuery() + "\" }";
-            throw new RuntimeException(e);
-        }
+    private static String toJson(Update u) {
+        return "{ \"update_id\":\"" + u.updateId() + "\", \"message\":\"" + u.message() + "\", \"edited_message\":\"" + u.editedMessage() + "\", \"channel_post\":\"" + u.channelPost() + "\", \"edited_channel_post\":\"" + u.editedChannelPost() + "\", \"inline_query\":\"" + u.inlineQuery() + "\", \"chosen_inline_result\":\"" + u.chosenInlineResult() + "\", \"callback_query\":\"" + u.callbackQuery() + "\", \"shipping_query\":\"" + u.shippingQuery() + "\", \"pre_checkout_query\":\"" + u.preCheckoutQuery() + "\" }";
     }
 
     private String rdbDeep(String source) {
