@@ -339,6 +339,11 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             }
         }
 
+        if (originalMessage.messageThreadId() != null) {
+            log.info("*personal reply message*");
+            my = true;
+        }
+
         if (adminSays) {
             log.info("*admin message*");
         }
