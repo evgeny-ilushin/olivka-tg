@@ -29,6 +29,7 @@ public class StandaloneBotTest {
                 Arrays.asList("bot", "MyBot", "@my_bot_nick"),
                 Arrays.asList("123"),
                 true,
+                -1L,
                 false,
                 true);
     }
