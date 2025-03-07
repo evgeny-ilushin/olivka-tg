@@ -103,7 +103,10 @@ public class BotCore {
     }
 
     public Optional<Message> sayOnChannel(IncomingMessage msg, String text) {
-        return sayOnChannel(msg.getChatId(), text, msg.isPersonal()? (msg.getOriginalMessage() != null? msg.getOriginalMessage().messageId() : null) : null);
+        String reply = msg.isPersonal()? text : msg.getNickName() + NewWorld.NICK_SEPARATOR + text;
+        Integer originalMessageId = msg.getOriginalMessage() != null? msg.getOriginalMessage().messageId() : null;
+        log.info("TG.originalMessageId: {}", originalMessageId);
+        return sayOnChannel(msg.getChatId(), reply, msg.isPersonal()? originalMessageId : null);
     }
 
     public Optional<Message> sayOnChannel(Long chatId, String text) {
@@ -118,7 +121,7 @@ public class BotCore {
         log.info("TG.sending to {}: {}", chatId, text);
 
         // Typing notification
-        if (config.getAlwaysShowTyping() || (text != null && text.length() > LONG_SENTENSE)) {
+        if (!config.isDebug() && config.getAlwaysShowTyping() || (text != null && text.length() > LONG_SENTENSE)) {
             typeOnChannel(chatId);
         }
 
@@ -151,7 +154,7 @@ public class BotCore {
                     ;
 
             if (replyToMessageId != null) {
-                request.replyToMessageId(replyToMessageId.intValue());
+                request.replyToMessageId(replyToMessageId);
             }
 
             if (options !=null) {

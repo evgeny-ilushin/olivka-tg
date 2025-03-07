@@ -393,8 +393,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         try {
             String qtext = Qify.text(msg.getText());
             if (qtext != null && !qtext.equals(msg.getText())) {
-                String reply = constructWhatToSayOnChannel(msg, qtext.trim());
-                sayOnChannel(msg, reply);
+                sayOnChannel(msg, qtext.trim());
             } else {
                 answerDonno(msg);
             }
@@ -683,7 +682,6 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                     //ec.getOutput();
                     String res = ec.output;
                     if (StringUtils.isNotBlank(res)) {
-                        res = constructWhatToSayOnChannel(msg, res);
                         sayOnChannel(msg, res);
                         numAttempts = 0;
                     } else {
@@ -719,7 +717,6 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                     //ec.getOutput();
                     String res = ec.output;
                     if (StringUtils.isNotBlank(res)) {
-                        res = constructWhatToSayOnChannel(msg, res);
                         sayOnChannel(msg, res);
                         numAttempts = 0;
                     } else {
@@ -734,10 +731,6 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-    }
-
-    private String constructWhatToSayOnChannel(IncomingMessage msg, String res) {
-        return msg.isPersonal()? res : msg.getNickName() + NewWorld.NICK_SEPARATOR + res;
     }
 
     private void answerPlugin(IncomingMessage msg, String text) {
@@ -974,7 +967,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
     public Object chanserv(Object payload) {
         if (config.isDebug()) {
-            return chanserv(-1L, new Nickname(10L, "DEBUG", true), "" + payload);
+            return chanserv(-123L, new Nickname(10L, "DEBUG", true), "" + payload, null);
         }
         return null;
     }

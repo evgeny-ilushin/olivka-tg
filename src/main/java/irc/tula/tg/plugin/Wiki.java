@@ -50,7 +50,7 @@ public class Wiki implements Plugin {
         if (answer[0] != null) {
             WikiHelper wh = new WikiHelper(answer[0]);
             if (wh.getExtractText() != null) {
-                bot.sayOnChannel(msg, (msg.isPersonal()? "" : (msg.getNickName() + ", ")) + limitTextUrl(wh.getExtractText(), MAX_WIKI, wh.getContentUrl()));
+                bot.sayOnChannel(msg, limitTextUrl(wh.getExtractText(), MAX_WIKI, wh.getContentUrl()));
                 return true;
             } else {
                 bot.answerDonno(msg);
