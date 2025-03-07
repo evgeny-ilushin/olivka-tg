@@ -261,7 +261,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
                 // I am text only
                 if (m.text() != null) {
-                    answered = chanserv(nick, m);
+                    answered = chanserv(m.chat().id(), nick, m.text(), m);
                     if (answered) {
                         addToAnsweredCache(update);
                     }
@@ -285,12 +285,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
 
-    private boolean chanserv(Nickname nick, Message message) {
-        return chanserv(message.chat().id(), nick, message.text(), message);
-    }
-
-    @Deprecated
-    public boolean chanserv(Long chatId, Nickname nickName, String text) {
+    public boolean chanservNoMsg(Long chatId, Nickname nickName, String text) {
         return chanserv(chatId, nickName, text, null);
     }
 
@@ -917,17 +912,17 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
         //boolean csRes = bot.chanserv(-1001082390874L, new Nickname(10L, "zloy", true), "глоток");
 
-        boolean csRes = bot.chanserv(-547476212L, new Nickname(412132074L, "@ncuxonycbka", true), "wiki ssd");
+        boolean csRes = bot.chanservNoMsg(-547476212L, new Nickname(412132074L, "@ncuxonycbka", true), "wiki ssd");
 
 
         if (true) {
             return;
         }
 
-        csRes = bot.chanserv(-1001082390874L, new Nickname(10L, "zloy", true), "2+2");
-        csRes = bot.chanserv(-100108239087L, new Nickname(11L, "zloy1", true), "2+2 43 324");
-        csRes = bot.chanserv(-100108239087L, new Nickname(12L, "zloy2", true), "маро");
-        csRes = bot.chanserv(-100108239087L, new Nickname(13L, "zloy3", true), "мас");
+        csRes = bot.chanservNoMsg(-1001082390874L, new Nickname(10L, "zloy", true), "2+2");
+        csRes = bot.chanservNoMsg(-100108239087L, new Nickname(11L, "zloy1", true), "2+2 43 324");
+        csRes = bot.chanservNoMsg(-100108239087L, new Nickname(12L, "zloy2", true), "маро");
+        csRes = bot.chanservNoMsg(-100108239087L, new Nickname(13L, "zloy3", true), "мас");
 
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "123");
 
@@ -953,7 +948,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         bot.members.put(1L, 2L, new Nickname(2L, "User2", true));
         bot.members.put(1L, 3L, new Nickname(3L, "User3", false));
 
-        bot.chanserv(-100108239087L, new Nickname(44L, "zloy", true), "а кто в жопе");
+        bot.chanservNoMsg(-100108239087L, new Nickname(44L, "zloy", true), "а кто в жопе");
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "а кто анус");
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "скажи частушку");
         //bot.chanserv(-1001082390874L, new Nickname("zloy", true), "гнилой, скажи частушку");
