@@ -286,7 +286,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
     }
 
     private boolean chanserv(Nickname nick, Message message) {
-        return chanserv(message.chat().id(), nick, message.text());
+        return chanserv(message.chat().id(), nick, message.text(), message);
     }
 
     @Deprecated
