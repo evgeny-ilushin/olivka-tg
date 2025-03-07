@@ -261,7 +261,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
                 // I am text only
                 if (m.text() != null) {
-                    answered = chanserv(replyChatId, nick, m.text());
+                    answered = chanserv(nick, m);
                     if (answered) {
                         addToAnsweredCache(update);
                     }
@@ -285,7 +285,16 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
 
+    private boolean chanserv(Nickname nick, Message message) {
+        return chanserv(message.chat().id(), nick, message.text());
+    }
+
+    @Deprecated
     public boolean chanserv(Long chatId, Nickname nickName, String text) {
+        return chanserv(chatId, nickName, text, null);
+    }
+
+    public boolean chanserv(Long chatId, Nickname nickName, String text, Message originalMessage) {
         boolean answered = false;
         log.info("chanserv: ({}, {}, {})", chatId, nickName, text);
         String replyNickName = nickName.toString();
@@ -327,7 +336,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             if (text.startsWith(s)) {
                 my = true;
                 log.info("*personal message*");
-                text = text.substring(s.length());
+                text = text.substring(s.length()).trim();
                 while (text.length() > 0 && (text.charAt(0) == Cave.NICK_SEPARATORS[0] || text.charAt(0) == Cave.NICK_SEPARATORS[1])) {
                     text = text.substring(1).trim();
                 }
@@ -339,7 +348,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             log.info("*admin message*");
         }
 
-        IncomingMessage msg = new IncomingMessage(chatId, nickName, text, my, adminSays);
+        IncomingMessage msg = new IncomingMessage(chatId, nickName, text, my, adminSays, originalMessage);
 
         // Admin commands
         if (processCommand(msg)) {
@@ -384,8 +393,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         try {
             String qtext = Qify.text(msg.getText());
             if (qtext != null && !qtext.equals(msg.getText())) {
-                String reply = msg.getNickName() + NewWorld.NICK_SEPARATOR + qtext.trim();
-                sayOnChannel(msg.getChatId(), reply);
+                String reply = constructWhatToSayOnChannel(msg, qtext.trim());
+                sayOnChannel(msg, reply);
             } else {
                 answerDonno(msg);
             }
@@ -674,8 +683,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                     //ec.getOutput();
                     String res = ec.output;
                     if (StringUtils.isNotBlank(res)) {
-                        res = msg.getNickName() + NewWorld.NICK_SEPARATOR + res;
-                        sayOnChannel(msg.getChatId(), res);
+                        res = constructWhatToSayOnChannel(msg, res);
+                        sayOnChannel(msg, res);
                         numAttempts = 0;
                     } else {
                         log.error("answerScript zero reply, retry: " + numAttempts);
@@ -710,8 +719,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                     //ec.getOutput();
                     String res = ec.output;
                     if (StringUtils.isNotBlank(res)) {
-                        res = msg.getNickName() + NewWorld.NICK_SEPARATOR + res;
-                        sayOnChannel(msg.getChatId(), res);
+                        res = constructWhatToSayOnChannel(msg, res);
+                        sayOnChannel(msg, res);
                         numAttempts = 0;
                     } else {
                         log.error("answerScript zero reply, retry: " + numAttempts);
@@ -725,6 +734,10 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    private String constructWhatToSayOnChannel(IncomingMessage msg, String res) {
+        return msg.isPersonal()? res : msg.getNickName() + NewWorld.NICK_SEPARATOR + res;
     }
 
     private void answerPlugin(IncomingMessage msg, String text) {

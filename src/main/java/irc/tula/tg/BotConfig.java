@@ -27,6 +27,8 @@ public class BotConfig {
     private List<String> ignore;
 
     private boolean debug;
+    private Long debugChatId;
+
     private boolean runTests = false;
 
     private Boolean alwaysShowTyping = true;
@@ -60,7 +62,7 @@ public class BotConfig {
 
     @Transient
     public static BotConfig getSample() {
-        return new BotConfig("/home/mybot", "123123123:454564", Cave.getEncoding(), Arrays.asList("@murzambek", "@zloy"), Arrays.asList("bot", "MyBot", "@my_bot_nick"), Arrays.asList("123"), true, false, true);
+        return new BotConfig("/home/mybot", "123123123:454564", Cave.getEncoding(), Arrays.asList("@murzambek", "@zloy"), Arrays.asList("bot", "MyBot", "@my_bot_nick"), Arrays.asList("123"), true, 123L, false, true);
     }
 
     public String asTable() {
@@ -72,6 +74,7 @@ public class BotConfig {
                 ", names=" + names +
                 ", ignore=" + ignore +
                 ", debug=" + debug +
+                ", debugChatId=" + debugChatId +
                 ", runTests=" + runTests +
                 ", alwaysShowTyping=" + alwaysShowTyping +
                 '}';

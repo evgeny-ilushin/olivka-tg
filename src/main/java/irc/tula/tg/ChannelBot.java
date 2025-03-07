@@ -6,12 +6,15 @@ import irc.tula.tg.entity.IncomingMessage;
 import irc.tula.tg.entity.Nickname;
 import irc.tula.tg.util.TextLog;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ChannelBot {
     void typeOnChannel(Long chatId);
     void sendImageToChat(Long chatId, String pathToFile);
     Optional<Message> sayOnChannel(Long chatId, String text);
+    Optional<Message> sayOnChannel(Long chatId, String text, Integer replyToMessageId);
+    Optional<Message> sayOnChannel(IncomingMessage msg, String text);
     Optional<Message> sendSticker(Long chatId, String text);
     void answerText(IncomingMessage msg, String reply);
     void answerDonno(IncomingMessage msg);

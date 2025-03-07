@@ -3,17 +3,19 @@ package irc.tula.tg;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.request.ChatAction;
-import com.pengrad.telegrambot.model.request.ParseMode;
+import com.pengrad.telegrambot.model.request.*;
 import com.pengrad.telegrambot.request.*;
 import com.pengrad.telegrambot.response.BaseResponse;
 import com.pengrad.telegrambot.response.SendResponse;
+import irc.tula.tg.entity.IncomingMessage;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -78,7 +80,7 @@ public class BotCore {
                 tg.execute(new SendChatAction(chatId, ChatAction.typing), null);
                 sleep(1000);
             } catch (Exception ex) {
-                log.error("sayOnChannel: {}", ex);
+                log.error("typeOnChannel: {}", ex);
             }
         }
     }
@@ -100,7 +102,19 @@ public class BotCore {
         }
     }
 
+    public Optional<Message> sayOnChannel(IncomingMessage msg, String text) {
+        return sayOnChannel(msg.getChatId(), text, msg.isPersonal()? (msg.getOriginalMessage() != null? msg.getOriginalMessage().messageId() : null) : null);
+    }
+
     public Optional<Message> sayOnChannel(Long chatId, String text) {
+        return sayOnChannel(chatId, text, null, null);
+    }
+
+    public Optional<Message> sayOnChannel(Long chatId, String text, Integer replyToMessageId) {
+        return sayOnChannel(chatId, text, replyToMessageId, null);
+    }
+
+    public Optional<Message> sayOnChannel(Long chatId, String text, Integer replyToMessageId, List<String> options) {
         log.info("TG.sending to {}: {}", chatId, text);
 
         // Typing notification
@@ -119,18 +133,33 @@ public class BotCore {
             }
 
             if (config.isDebug()) {
-                log.info("FAKE SEND: {} {}", chatId, text);
-                System.err.println("FAKE SEND: {" + chatId + "}: " + text);
-                return Optional.empty();
+                if (config.getDebugChatId() != null) {
+                    chatId = config.getDebugChatId();
+                    log.info("DEBUG SEND to chatId {}: {}", chatId, text);
+                } else {
+                    log.info("FAKE SEND: {} {}", chatId, text);
+                    System.err.println("FAKE SEND: {" + chatId + "}: " + text);
+                    return Optional.empty();
+                }
             }
 
             SendMessage request = new SendMessage(chatId, text)
                     .parseMode(ParseMode.HTML)
                     .disableWebPagePreview(true)
                     .disableNotification(true)
-                    //.replyToMessageId(1)
                     //.replyMarkup(new ForceReply())
                     ;
+
+            if (replyToMessageId != null) {
+                request.replyToMessageId(replyToMessageId.intValue());
+            }
+
+            if (options !=null) {
+                List<KeyboardButton> buttons = new ArrayList<>();
+                options.forEach(opt -> buttons.add(new KeyboardButton(opt)));
+                Keyboard keyboard = new ReplyKeyboardMarkup(buttons.toArray(new KeyboardButton[0]));
+                request.replyMarkup(keyboard);
+            }
 
             SendResponse sendResponse = tg.execute(request);
             boolean ok = sendResponse.isOk();

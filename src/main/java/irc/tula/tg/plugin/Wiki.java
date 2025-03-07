@@ -50,7 +50,7 @@ public class Wiki implements Plugin {
         if (answer[0] != null) {
             WikiHelper wh = new WikiHelper(answer[0]);
             if (wh.getExtractText() != null) {
-                bot.sayOnChannel(msg.getChatId(), msg.getNickName() + ", " + limitText(wh.getExtractText(), MAX_WIKI));
+                bot.sayOnChannel(msg, (msg.isPersonal()? "" : (msg.getNickName() + ", ")) + limitTextUrl(wh.getExtractText(), MAX_WIKI, wh.getContentUrl()));
                 return true;
             } else {
                 bot.answerDonno(msg);
@@ -59,6 +59,14 @@ public class Wiki implements Plugin {
             //bot.answerDonno(msg);
         }
         return false;
+    }
+
+    private String limitTextUrl(String text, int maxLengh, String url) {
+        if (text == null || text.length() < maxLengh) {
+            return text;
+        }
+
+        return text.substring(0, maxLengh) + "<a href=\"" + url + "\">...</a>";
     }
 
     private Object limitText(String text, int maxLengh) {
@@ -86,6 +94,7 @@ class WikiHelper {
     String displayTitle="";
     String imageURL="";
     String extractText="";
+    String contentUrl = null;
 
     public WikiHelper(String subject)
     {
@@ -95,14 +104,11 @@ class WikiHelper {
 
     private void getData() {
         if (tryRussianFirst) {
-            if (containsCyrilic(subject)) {
+            {
                 getData(BASE_URL_R);
                 if (extractText == null || StringUtils.isBlank(extractText)) {
                     getData(BASE_URL);
                 }
-            }
-            else {
-                getData(urlFor(subject));
             }
         }
         else {
@@ -120,12 +126,29 @@ class WikiHelper {
             String data = response.body().string();
             JSONParser parser = new JSONParser();
             JSONObject jsonObject = (JSONObject)parser.parse(data);
-            displayTitle= (String) jsonObject.get("displaytitle");
-            JSONObject jsonObjectOriginalImage = (JSONObject) jsonObject.get("originalimage");
-            if (jsonObjectOriginalImage != null) {
-                imageURL = (String) jsonObjectOriginalImage.get("source");
+            String resType = (String)jsonObject.get("type");
+            // Not found
+            if (resType.endsWith("not_found")) {
+                extractText = (String) jsonObject.get("detail");
+                if (extractText == null) {
+                    extractText = "not found :/";
+                }
+            } else
+            // Regular reply
+            if (resType.equalsIgnoreCase("standard")) {
+                displayTitle = (String) jsonObject.get("displaytitle");
+                JSONObject jsonObjectOriginalImage = (JSONObject) jsonObject.get("originalimage");
+                contentUrl = (String)((JSONObject)((JSONObject)jsonObject.get("content_urls")).get("mobile")).get("page");
+                if (jsonObjectOriginalImage != null) {
+                    imageURL = (String) jsonObjectOriginalImage.get("source");
+                }
+                extractText = (String) jsonObject.get("extract");
             }
-            extractText = (String)jsonObject.get("extract");
+            // Options
+            else if (resType.equalsIgnoreCase("disambiguation")) {
+                // options = new ArrayList<String>();
+                extractText = (String) jsonObject.get("extract");
+            }
         }
         catch (IOException | ParseException e) {
             e.printStackTrace();
@@ -133,12 +156,15 @@ class WikiHelper {
     }
 
     private String urlFor(String text) {
+        return containsCyrilic(text)? BASE_URL_R : BASE_URL;
+        /*
         for (int i = 0; i < text.length(); i++) {
             if (Character.UnicodeBlock.of(text.charAt(i)).equals(Character.UnicodeBlock.CYRILLIC)) {
                 return BASE_URL_R;
             }
         }
         return BASE_URL;
+        */
     }
 
     private Boolean containsCyrilic_ГОВНО(String text) {
@@ -167,5 +193,9 @@ class WikiHelper {
 
     public String getExtractText() {
         return extractText;
+    }
+
+    public String getContentUrl() {
+        return contentUrl;
     }
 }
