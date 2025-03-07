@@ -12,7 +12,7 @@ public class IncomingMessage {
     final @NonNull String text;
     final @NonNull boolean isPersonal;
     final @NonNull boolean isAdminMessage;
-    final boolean wasTrimmedToParams = false;
+    boolean wasTrimmedToParams = false;
     final Message originalMessage;
 
     final Date ts = new Date();
