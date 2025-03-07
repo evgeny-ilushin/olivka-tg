@@ -80,11 +80,6 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
     }
 
     public static void main(String[] args) {
-        // 1234
-        if (true) {
-            return;
-        }
-
         try {
             if (args.length != 1) {
                 log.error("Usage: BOT_JAR <path to config.json>");
