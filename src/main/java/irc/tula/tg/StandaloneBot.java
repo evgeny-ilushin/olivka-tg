@@ -296,7 +296,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
     public boolean chanserv(Long chatId, Nickname nickName, String text, Message originalMessage) {
         boolean answered = false;
-        log.info("chanserv: ({}, {}, {})", chatId, nickName, text);
+        log.info("chanserv: ({}, {}, {}, {})", chatId, nickName, text, originalMessage == null? null : originalMessage.messageId());
         String replyNickName = nickName.toString();
         Long from_id = nickName.getId();
 

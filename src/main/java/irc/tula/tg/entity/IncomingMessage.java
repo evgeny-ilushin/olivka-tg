@@ -7,13 +7,13 @@ import java.util.Date;
 
 @Data
 public class IncomingMessage {
-    @NonNull Long chatId;
-    @NonNull Nickname nickName;
-    @NonNull String text;
-    @NonNull boolean isPersonal;
-    @NonNull boolean isAdminMessage;
-    boolean wasTrimmedToParams = false;
-    Message originalMessage;
+    final @NonNull Long chatId;
+    final @NonNull Nickname nickName;
+    final @NonNull String text;
+    final @NonNull boolean isPersonal;
+    final @NonNull boolean isAdminMessage;
+    final boolean wasTrimmedToParams = false;
+    final Message originalMessage;
 
     final Date ts = new Date();
 
