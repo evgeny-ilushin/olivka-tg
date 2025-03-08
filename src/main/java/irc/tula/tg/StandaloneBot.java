@@ -1,6 +1,5 @@
 package irc.tula.tg;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.pengrad.telegrambot.UpdatesListener;
@@ -51,6 +50,9 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
     @Getter
     final private TextLog callbacks;
 
+    @Getter
+    private Long myUserId = null;
+
     // Members
     @Getter
     //private HashMap<Integer, Nickname> members = new HashMap<>();
@@ -77,6 +79,8 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         mapper = new JsonObjectMapper(getConfig().getDataDirName());
         loadCaches();
         loadPlugins();
+        // TODO: load from API
+        myUserId = config.getBotUserId();
     }
 
     public static void main(String[] args) {
@@ -129,7 +133,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         while (true) {
             System.out.print("talkToMe> ");
             text = reader.readLine();
-            System.out.println("" + bot.chanserv(text));
+            System.out.println("" + bot.fakeChanserv(text));
         }
     }
 
@@ -328,6 +332,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         boolean my = false;
         boolean adminSays = getConfig().isAdmin(nickName.toString());
 
+        // My name
         for (String s: getConfig().getNames()) {
             if (text.startsWith(s)) {
                 my = true;
@@ -340,9 +345,9 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             }
         }
 
-        if (originalMessage != null && originalMessage.messageThreadId() != null) {
-            log.info("*personal reply message*");
-            // my = true;
+        if (originalMessage != null && originalMessage.replyToMessage() != null && originalMessage.replyToMessage().from().id().equals(myUserId)) {
+            log.info("*personal reply message* to me, {}", myUserId);
+            my = true;
         }
 
         if (adminSays) {
@@ -969,7 +974,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         String p1_dev1 = "{ \"update_id\":\"18322332\", \"message\":\"null\", \"edited_message\":\"null\", \"channel_post\":\"Message{message_id=7, from=null, date=1565769693, chat=Chat{id=-1001343308314, type=channel, first_name='null', last_name='null', username='olivka_dev', title='olivka development', all_members_are_administrators=null, photo=null, description='null', invite_link='null', pinned_message=null, sticker_set_name='null', can_set_sticker_set=null}, forward_from=null, forward_from_chat=null, forward_from_message_id=null, forward_signature='null', forward_date=null, reply_to_message=null, edit_date=null, media_group_id='null', author_signature='null', text='2', entities=null, caption_entities=null, audio=null, document=null, animation=null, game=null, photo=null, sticker=null, video=null, voice=null, video_note=null, caption='null', contact=null, location=null, venue=null, new_chat_member=null, new_chat_members=null, left_chat_member=null, new_chat_title='null', new_chat_photo=null, delete_chat_photo=null, group_chat_created=null, supergroup_chat_created=null, channel_chat_created=null, migrate_to_chat_id=null, migrate_from_chat_id=null, pinned_message=null, invoice=null, successful_payment=null, connected_website='null', passport_data=null}\", \"edited_channel_post\":\"null\", \"inline_query\":\"null\", \"chosen_inline_result\":\"null\", \"callback_query\":\"null\", \"shipping_query\":\"null\", \"pre_checkout_query\":\"null\" }";
     }
 
-    public Object chanserv(Object payload) {
+    public Object fakeChanserv(Object payload) {
         if (config.isDebug()) {
             return chanserv(-123L, new Nickname(10L, "DEBUG", true), "" + payload, null);
         }

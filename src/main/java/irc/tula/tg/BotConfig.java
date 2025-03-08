@@ -28,6 +28,7 @@ public class BotConfig {
 
     private boolean debug;
     private Long debugChatId;
+    private Long botUserId;
 
     private boolean runTests = false;
 
@@ -62,7 +63,7 @@ public class BotConfig {
 
     @Transient
     public static BotConfig getSample() {
-        return new BotConfig("/home/mybot", "123123123:454564", Cave.getEncoding(), Arrays.asList("@murzambek", "@zloy"), Arrays.asList("bot", "MyBot", "@my_bot_nick"), Arrays.asList("123"), true, 123L, false, true);
+        return new BotConfig("/home/mybot", "123123123:454564", Cave.getEncoding(), Arrays.asList("@murzambek", "@ali"), Arrays.asList("bot", "MyBot", "@my_bot_nick"), Arrays.asList("123"), true, 123L, 456L, false, true);
     }
 
     public String asTable() {
@@ -75,6 +76,7 @@ public class BotConfig {
                 ", ignore=" + ignore +
                 ", debug=" + debug +
                 ", debugChatId=" + debugChatId +
+                ", botUserId=" + botUserId +
                 ", runTests=" + runTests +
                 ", alwaysShowTyping=" + alwaysShowTyping +
                 '}';

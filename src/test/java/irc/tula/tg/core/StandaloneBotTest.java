@@ -30,6 +30,7 @@ public class StandaloneBotTest {
                 Arrays.asList("123"),
                 true,
                 -1L,
+                -1L,
                 false,
                 true);
     }
