@@ -763,8 +763,9 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
 
     public void answerText(IncomingMessage msg, String text) {
         log.info("answerText: {} {}", msg, text);
+        boolean hasNicks = caveHasNicks(text);
         String fullText = caveReplace(msg.getChatId(), text, msg.getNickName());
-        sayOnChannel(msg, fullText);
+        sayOnChannel(msg, fullText, !hasNicks);
     }
 
     private boolean caveHasNicks(String text) {
@@ -787,8 +788,10 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         if (dn == null)
             return;
 
-        String fullText = caveReplace(msg.getChatId(), nextString(dn), msg.getNickName());
-        sayOnChannel(msg, fullText);
+        String donno = nextString(dn);
+        boolean hasNicks = caveHasNicks(donno);
+        String fullText = caveReplace(msg.getChatId(), donno, msg.getNickName());
+        sayOnChannel(msg, fullText, !hasNicks);
     }
 
     public String nextString(RDBResource r) {
