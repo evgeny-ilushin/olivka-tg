@@ -15,6 +15,7 @@ public interface ChannelBot {
     Optional<Message> sayOnChannel(Long chatId, String text, Integer replyToMessageId);
     Optional<Message> sayOnChannel(IncomingMessage msg, String text);
     Optional<Message> sayOnChannelNoPrefix(IncomingMessage msg, String text);
+    Optional<Message> sayOnChannel(IncomingMessage msg, String text, boolean addPrefix);
     Optional<Message> sendSticker(Long chatId, String text);
     void answerText(IncomingMessage msg, String reply);
     void answerDonno(IncomingMessage msg);

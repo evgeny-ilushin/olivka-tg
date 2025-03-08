@@ -767,6 +767,10 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
         sayOnChannel(msg, fullText);
     }
 
+    private boolean caveHasNicks(String text) {
+        return text != null && (text.contains("N~") || text.contains("R~") || text.startsWith("+"));
+    }
+
     private String caveReplace(Long chatId, String text, Nickname nickName) {
         String res = text.replaceAll("N~", nickName.toString()).replaceAll("R~", randomNick(chatId).toString()).replaceAll(Cave.LINE_SEPARATOR, NewWorld.LINE_SEPARATOR);
         if (res.startsWith("+")) {
@@ -800,8 +804,10 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             if (dn == null)
                 return;
 
-            String fullText = caveReplace(msg.getChatId(), nextString(dn), msg.getNickName());
-            sayOnChannel(msg, fullText);
+            String rdbChoice = nextString(dn);
+            boolean hasNicks = caveHasNicks(rdbChoice);
+            String fullText = caveReplace(msg.getChatId(), rdbChoice, msg.getNickName());
+            sayOnChannel(msg, fullText, !hasNicks);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
