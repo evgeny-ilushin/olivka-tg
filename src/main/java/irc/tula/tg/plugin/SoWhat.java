@@ -151,8 +151,7 @@ public class SoWhat implements Plugin {
                     break;
                 }
             }
-            msg.setPersonal(false);
-            bot.sayOnChannel(msg, dateList.toString());
+            bot.sayOnChannelNoPrefix(msg, dateList.toString());
         }
 
         return false;

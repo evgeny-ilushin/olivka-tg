@@ -102,7 +102,15 @@ public class BotCore {
     }
 
     public Optional<Message> sayOnChannel(IncomingMessage msg, String text) {
-        String reply = msg.isPersonal()? text : msg.getNickName() + NewWorld.NICK_SEPARATOR + text;
+        return sayOnChannel(msg, text, true);
+    }
+
+    public Optional<Message> sayOnChannelNoPrefix(IncomingMessage msg, String text) {
+        return sayOnChannel(msg, text, false);
+    }
+
+    public Optional<Message> sayOnChannel(IncomingMessage msg, String text, boolean addPrefix) {
+        String reply = (!addPrefix || msg.isPersonal())? text : (msg.getNickName() + NewWorld.NICK_SEPARATOR + text);
         Integer originalMessageId = msg.getOriginalMessage() != null? msg.getOriginalMessage().messageId() : null;
         log.info("TG.originalMessageId: {}", originalMessageId);
         return sayOnChannel(msg.getChatId(), reply, msg.isPersonal()? originalMessageId : null);
