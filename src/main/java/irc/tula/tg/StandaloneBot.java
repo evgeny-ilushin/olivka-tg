@@ -142,6 +142,7 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
             plugin.getNames().forEach(i -> plugins.put(i, plugin));
         }
         plugins.put(plugin.getName(), plugin);
+        plugin.initialize(this);
     }
 
     private void loadPlugins() {
@@ -154,7 +155,6 @@ public class StandaloneBot extends BotCore implements UpdatesListener, ChannelBo
                 new Glotok(),
                 new Wiki()
         }).forEach(this::addPlugin);
-        plugins.forEach((k,v) -> v.initialize(this));
     }
 
     protected boolean wasAnsweredRecently(Update update) {

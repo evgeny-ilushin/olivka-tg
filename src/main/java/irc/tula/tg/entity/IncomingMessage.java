@@ -10,7 +10,7 @@ public class IncomingMessage {
     final @NonNull Long chatId;
     final @NonNull Nickname nickName;
     final @NonNull String text;
-    final @NonNull boolean isPersonal;
+    @NonNull boolean isPersonal;
     final @NonNull boolean isAdminMessage;
     boolean wasTrimmedToParams = false;
     final Message originalMessage;
