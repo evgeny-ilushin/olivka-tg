@@ -1,0 +1,17 @@
+.idea/
+.gradle/
+
+build/
+log/
+
+*.iml
+
+/velocity.log
+
+.idea/sonarlint/issuestore/
+
+data/
+samples/
+target/
+tmp/
+
